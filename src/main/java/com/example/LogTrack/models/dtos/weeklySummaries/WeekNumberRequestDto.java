@@ -1,4 +1,4 @@
-package com.example.LogTrack.models.dtos;
+package com.example.LogTrack.models.dtos.weeklySummaries;
 
 import lombok.Data;
 

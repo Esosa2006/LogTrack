@@ -1,4 +1,4 @@
-package com.example.LogTrack.models.dtos;
+package com.example.LogTrack.models.dtos.LogEntries;
 
 import lombok.Data;
 
@@ -10,5 +10,5 @@ public class DailyEntrySummary {
     private LocalDate date;
     private String studentName;
     private String matricNumber;
-    private String comment;
+    private String activityDescription;
 }

@@ -20,6 +20,8 @@ public class LogEntry {
     private Student student;
     @Column(name = "status")
     private EntryStatus status;
+    @Column(name = "activityDescrption")
+    private String activityDescription;
     @Column(name = "comment")
     private String comment;
     @ManyToOne

@@ -2,9 +2,8 @@ package com.example.LogTrack.services;
 
 import com.example.LogTrack.mapper.LogEntryForSummaryMapper;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
-import com.example.LogTrack.models.dtos.EntryDisplayDto;
-import com.example.LogTrack.models.dtos.WeekNumberRequestDto;
-import com.example.LogTrack.models.dtos.WeeklySummaryViewDto;
+import com.example.LogTrack.models.dtos.LogEntries.EntryDisplayDto;
+import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.WeeklySummary;

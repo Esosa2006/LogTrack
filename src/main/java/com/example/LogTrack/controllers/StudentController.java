@@ -1,6 +1,9 @@
 package com.example.LogTrack.controllers;
 
-import com.example.LogTrack.models.dtos.*;
+import com.example.LogTrack.models.dtos.LogEntries.DailyEntrySummary;
+import com.example.LogTrack.models.dtos.LogEntries.LogEntryCreationDto;
+import com.example.LogTrack.models.dtos.LogEntries.LogEntryRequestDto;
+import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.services.StudentService;
 import com.example.LogTrack.services.WeeklySummaryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +26,7 @@ public class StudentController{
     }
 
     @PostMapping("/entity/create")
-    public ResponseEntity<String> createLogEntry(@RequestBody LogEntryCreationDto  logEntryCreationDto,
+    public ResponseEntity<String> createLogEntry(@RequestBody LogEntryCreationDto logEntryCreationDto,
                                                  Authentication authentication){
         String email = authentication.getName();
         return studentService.createLogEntry(logEntryCreationDto, email);
@@ -31,7 +34,7 @@ public class StudentController{
 
     @GetMapping("/entry/view")
     public ResponseEntity<DailyEntrySummary> viewLogEntry(@RequestParam int weekNumber,
-                                                          @RequestBody int dayNo,
+                                                          @RequestParam int dayNo,
                                                           Authentication authentication){
         String email = authentication.getName();
         return studentService.viewLogEntry(weekNumber, dayNo, email);

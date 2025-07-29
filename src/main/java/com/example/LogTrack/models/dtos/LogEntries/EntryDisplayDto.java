@@ -1,4 +1,4 @@
-package com.example.LogTrack.models.dtos;
+package com.example.LogTrack.models.dtos.LogEntries;
 
 import lombok.Data;
 
@@ -8,5 +8,5 @@ import java.time.LocalDate;
 public class EntryDisplayDto {
     private LocalDate date;
     private String studentName;
-    private String comment;
+    private String activityDescription;
 }

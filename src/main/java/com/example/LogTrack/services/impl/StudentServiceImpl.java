@@ -1,9 +1,9 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.EntryStatus;
-import com.example.LogTrack.models.dtos.DailyEntrySummary;
-import com.example.LogTrack.models.dtos.LogEntryCreationDto;
-import com.example.LogTrack.models.dtos.LogEntryRequestDto;
+import com.example.LogTrack.models.dtos.LogEntries.DailyEntrySummary;
+import com.example.LogTrack.models.dtos.LogEntries.LogEntryCreationDto;
+import com.example.LogTrack.models.dtos.LogEntries.LogEntryRequestDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.WeeklySummary;
@@ -46,7 +46,7 @@ public class StudentServiceImpl implements StudentService {
         logEntry.setDate(LocalDate.now());
         logEntry.setStudent(student);
         logEntry.setStatus(EntryStatus.PENDING);
-        logEntry.setComment(logEntryCreationDto.getComment());
+        logEntry.setActivityDescription(logEntryCreationDto.getActivityDescription());
         studentRepository.save(weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student));
         logEntryRepository.save(logEntry);
         return ResponseEntity.status(HttpStatus.CREATED).body("Entry successfully created");
@@ -65,7 +65,7 @@ public class StudentServiceImpl implements StudentService {
         LogEntry logEntry = weeklySummary.getEntries().get(dayNo - 1);
         DailyEntrySummary dailyEntrySummary = new DailyEntrySummary();
         dailyEntrySummary.setDate(logEntry.getDate());
-        dailyEntrySummary.setComment(logEntry.getComment());
+        dailyEntrySummary.setActivityDescription(logEntry.getActivityDescription());
         dailyEntrySummary.setStudentName(logEntry.getStudent().getName());
         dailyEntrySummary.setMatricNumber(logEntry.getStudent().getMatricNumber());
         dailyEntrySummary.setId(logEntry.getId());
@@ -83,8 +83,8 @@ public class StudentServiceImpl implements StudentService {
             throw new RuntimeException("Log entry for " + student.getName() + " with id " + id + " not found!");
         }
         if (logEntry.getStatus().equals(EntryStatus.PENDING)) {
-            if (updates.containsKey("comment")) {
-                logEntry.setComment((String) updates.get("comment"));
+            if (updates.containsKey("activityDescription")) {
+                logEntry.setActivityDescription((String) updates.get("activityDescription"));
                 logEntryRepository.save(logEntry);
                 studentRepository.save(weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntry.getWeeklySummary().getWeekNumber(), student));
                 return ResponseEntity.status(HttpStatus.OK).body("Entry successfully updated");

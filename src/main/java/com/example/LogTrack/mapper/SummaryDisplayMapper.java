@@ -1,6 +1,6 @@
 package com.example.LogTrack.mapper;
 
-import com.example.LogTrack.models.dtos.WeeklySummaryViewDto;
+import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.WeeklySummary;
 import lombok.Data;
 import org.springframework.stereotype.Component;

@@ -1,10 +1,9 @@
 package com.example.LogTrack.services;
 
-import com.example.LogTrack.models.dtos.DailyEntrySummary;
-import com.example.LogTrack.models.dtos.LogEntryCreationDto;
-import com.example.LogTrack.models.dtos.LogEntryRequestDto;
+import com.example.LogTrack.models.dtos.LogEntries.DailyEntrySummary;
+import com.example.LogTrack.models.dtos.LogEntries.LogEntryCreationDto;
+import com.example.LogTrack.models.dtos.LogEntries.LogEntryRequestDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
 

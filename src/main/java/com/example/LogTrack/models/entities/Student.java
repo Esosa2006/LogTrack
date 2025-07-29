@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.Map;
 
 @Entity
 public class Student extends AppUser {
