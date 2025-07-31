@@ -1,6 +1,7 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.EntryStatus;
+import com.example.LogTrack.exceptions.exceptions.*;
 import com.example.LogTrack.models.dtos.logEntries.DailyEntrySummary;
 import com.example.LogTrack.models.dtos.logEntries.LogEntryCreationDto;
 import com.example.LogTrack.models.dtos.logEntries.LogEntryRequestDto;
@@ -40,7 +41,7 @@ public class LogEntryServiceImpl implements LogEntryService {
     public ResponseEntity<String> createLogEntry(LogEntryCreationDto logEntryCreationDto, String email) {
         Student student = studentRepository.findByEmail(email);
         if (student == null) {
-            return ResponseEntity.notFound().build();
+            throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
         LogEntry logEntry = new LogEntry();
         logEntry.setDate(LocalDate.now());
@@ -56,10 +57,10 @@ public class LogEntryServiceImpl implements LogEntryService {
         Student student = studentRepository.findByEmail(email);
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNumber, student);
         if (weeklySummary == null) {
-            throw new RuntimeException("No week with this week number was found!");
+            throw new WeeklySummaryNotFoundException("No week with this week number was found!");
         }
         if (dayNo < 1 || dayNo > 7) {
-            throw new RuntimeException("Invalid day number! Pick between days 1-6");
+            throw new InvalidDayNumberException("Invalid day number! Pick between days 1-6");
         }
         LogEntry logEntry = weeklySummary.getEntries().get(dayNo - 1);
         DailyEntrySummary dailyEntrySummary = new DailyEntrySummary();
@@ -75,9 +76,9 @@ public class LogEntryServiceImpl implements LogEntryService {
     public ResponseEntity<String> updateLogEntry(String email, Long id, Map<String, Object> updates) {
         Student student = studentRepository.findByEmail(email);
         if (student == null) {
-            throw new RuntimeException("Student with email " + email + " not found!");
+            throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
-        LogEntry logEntry = logEntryRepository.findById(id).orElseThrow(() -> new RuntimeException("Log entry for " + student.getName() + " with id " + id + " not found!"));
+        LogEntry logEntry = logEntryRepository.findById(id).orElseThrow(() -> new NoLogEntryFoundException("Log entry for " + student.getName() + " with id " + id + " not found!"));
         if (logEntry.getStatus().equals(EntryStatus.PENDING)) {
             if (updates.containsKey("activityDescription")) {
                 logEntry.setActivityDescription((String) updates.get("activityDescription"));
@@ -86,11 +87,11 @@ public class LogEntryServiceImpl implements LogEntryService {
                 return ResponseEntity.status(HttpStatus.OK).body("Entry successfully updated");
             }
             else{
-                throw new RuntimeException("You cannot edit this field!");
+                throw new FieldRestrictionException("You cannot edit this field!");
             }
         }
         else{
-            throw new RuntimeException("You cant edit an already approved Entry!");
+            throw new EntryAlreadyApprovedException("You cant edit an already approved Entry!");
         }
     }
 
@@ -112,7 +113,7 @@ public class LogEntryServiceImpl implements LogEntryService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid day number!");
         }
         if (entries.size() < logEntryRequestDto.getDayNo()) {
-            throw new RuntimeException("No log entry for this day.");
+            throw new NoLogEntryFoundException("No log entry for this day.");
         }
 
         LogEntry logEntry = entries.get(index);

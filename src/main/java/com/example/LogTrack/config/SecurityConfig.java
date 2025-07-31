@@ -1,5 +1,6 @@
 package com.example.LogTrack.config;
 
+import com.example.LogTrack.security.CustomAuthenticationEntryPoint;
 import com.example.LogTrack.security.JWTFilter;
 import com.example.LogTrack.security.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +35,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/student/**", "/supervisor/**", "/admin/**").permitAll()
+                        .requestMatchers("/student/**", "/supervisor/**", "/auth/**").permitAll()
                         .anyRequest().authenticated())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

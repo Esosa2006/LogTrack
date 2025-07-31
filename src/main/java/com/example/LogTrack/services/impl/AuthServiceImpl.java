@@ -1,6 +1,9 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.Role;
+import com.example.LogTrack.exceptions.exceptions.AuthenticationFailedException;
+import com.example.LogTrack.exceptions.exceptions.EmailAlreadyInUseException;
+import com.example.LogTrack.exceptions.exceptions.PasswordMissmatchException;
 import com.example.LogTrack.models.dtos.authDtos.LoginDto;
 import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
@@ -38,10 +41,10 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<String> studentSignUp(StudentSignUpRequest signUpRequest) {
         Student student = studentRepository.findByEmail(signUpRequest.getEmail());
         if (student != null) {
-            throw new RuntimeException("This email is already registered");
+            throw new EmailAlreadyInUseException("This email is already registered");
         }
         if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
+            throw new PasswordMissmatchException("Passwords do not match");
         }
         Student newStudent = createStudent(signUpRequest);
         studentRepository.save(newStudent);
@@ -52,7 +55,10 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<String> supervisorSignUp(SupervisorSignUpRequest supervisorSignUpRequest) {
         Supervisor supervisor = supervisorRepository.findByEmail(supervisorSignUpRequest.getEmail());
         if (supervisor != null) {
-            throw new RuntimeException("This email is already registered");
+            throw new EmailAlreadyInUseException("This email is already registered");
+        }
+        if (!supervisorSignUpRequest.getPassword().equals(supervisorSignUpRequest.getConfirmPassword())) {
+            throw new PasswordMissmatchException("Passwords do not match");
         }
         Supervisor newSupervisor = createSupervisor(supervisorSignUpRequest);
         supervisorRepository.save(newSupervisor);
@@ -63,15 +69,12 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<String> login(LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
         if (!authentication.isAuthenticated()) {
-            throw new RuntimeException("Authentication failed");
+            throw new AuthenticationFailedException("Authentication failed");
         }
         return ResponseEntity.status(HttpStatus.OK).body(jwtService.generateToken(loginDto.getEmail()));
     }
 
     private static Student createStudent(StudentSignUpRequest studentSignUpRequest) {
-        if (!studentSignUpRequest.getPassword().equals(studentSignUpRequest.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
-        }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         Student newStudent = new Student();
         newStudent.setEmail(studentSignUpRequest.getEmail());
@@ -83,9 +86,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private static Supervisor createSupervisor(SupervisorSignUpRequest supervisorSignUpRequest) {
-        if (!supervisorSignUpRequest.getPassword().equals(supervisorSignUpRequest.getConfirmPassword())) {
-            throw new RuntimeException("Passwords do not match");
-        }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         Supervisor newSupervisor = new Supervisor();
         newSupervisor.setEmail(supervisorSignUpRequest.getEmail());
