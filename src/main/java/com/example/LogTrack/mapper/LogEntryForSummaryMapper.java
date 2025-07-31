@@ -1,6 +1,6 @@
 package com.example.LogTrack.mapper;
 
-import com.example.LogTrack.models.dtos.LogEntries.EntryDisplayDto;
+import com.example.LogTrack.models.dtos.logEntries.EntryDisplayDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import lombok.Data;
 import org.springframework.stereotype.Component;

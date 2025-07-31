@@ -4,7 +4,7 @@ import com.example.LogTrack.enums.EntryStatus;
 import com.example.LogTrack.mapper.LogEntryForSupervisorMapper;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
 import com.example.LogTrack.models.dtos.EvaluationDto;
-import com.example.LogTrack.models.dtos.LogEntries.SupervisorLogEntryView;
+import com.example.LogTrack.models.dtos.logEntries.SupervisorLogEntryView;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;

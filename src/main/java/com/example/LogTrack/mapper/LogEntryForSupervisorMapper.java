@@ -1,8 +1,7 @@
 package com.example.LogTrack.mapper;
 
-import com.example.LogTrack.models.dtos.LogEntries.SupervisorLogEntryView;
+import com.example.LogTrack.models.dtos.logEntries.SupervisorLogEntryView;
 import com.example.LogTrack.models.entities.LogEntry;
-import com.example.LogTrack.models.entities.Supervisor;
 import org.springframework.stereotype.Component;
 
 @Component

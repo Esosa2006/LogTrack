@@ -1,8 +1,8 @@
 package com.example.LogTrack.services;
 
-import com.example.LogTrack.models.dtos.LogEntries.DailyEntrySummary;
-import com.example.LogTrack.models.dtos.LogEntries.LogEntryCreationDto;
-import com.example.LogTrack.models.dtos.LogEntries.LogEntryRequestDto;
+import com.example.LogTrack.models.dtos.logEntries.DailyEntrySummary;
+import com.example.LogTrack.models.dtos.logEntries.LogEntryCreationDto;
+import com.example.LogTrack.models.dtos.logEntries.LogEntryRequestDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Map;

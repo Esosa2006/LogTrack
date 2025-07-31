@@ -1,4 +1,4 @@
-package com.example.LogTrack.models.dtos.LogEntries;
+package com.example.LogTrack.models.dtos.logEntries;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

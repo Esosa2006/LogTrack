@@ -1,9 +1,8 @@
 package com.example.LogTrack.controllers;
 
 import com.example.LogTrack.models.dtos.EvaluationDto;
-import com.example.LogTrack.models.dtos.LogEntries.SupervisorLogEntryView;
+import com.example.LogTrack.models.dtos.logEntries.SupervisorLogEntryView;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
-import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.services.SupervisorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

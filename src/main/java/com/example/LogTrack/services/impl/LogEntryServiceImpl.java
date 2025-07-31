@@ -1,9 +1,9 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.EntryStatus;
-import com.example.LogTrack.models.dtos.LogEntries.DailyEntrySummary;
-import com.example.LogTrack.models.dtos.LogEntries.LogEntryCreationDto;
-import com.example.LogTrack.models.dtos.LogEntries.LogEntryRequestDto;
+import com.example.LogTrack.models.dtos.logEntries.DailyEntrySummary;
+import com.example.LogTrack.models.dtos.logEntries.LogEntryCreationDto;
+import com.example.LogTrack.models.dtos.logEntries.LogEntryRequestDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.WeeklySummary;
