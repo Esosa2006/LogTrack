@@ -48,12 +48,11 @@ public class WeeklySummaryService {
             WeeklySummary targetSummary = getWeeklySummaryNotUpToFive(summaries);
             if (targetSummary != null) {
                 targetSummary.getEntries().add(logEntry);
-                replaceInList(summaries, targetSummary);
                 weeklySummaryRepository.save(targetSummary);
             } else {
                 WeeklySummary newSummary = new WeeklySummary();
                 newSummary.setStudent(student);
-                newSummary.setWeekNumber(summaries.size() + 1); // or use logEntryCreationDto.getWeekNumber()
+                newSummary.setWeekNumber(summaries.size() + 1);
                 newSummary.getEntries().add(logEntry);
                 summaries.add(newSummary);
                 weeklySummaryRepository.save(newSummary);
@@ -78,14 +77,6 @@ public class WeeklySummaryService {
             }
         }
         return false;
-    }
-    private void replaceInList(List<WeeklySummary> list, WeeklySummary summary) {
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getId().equals(summary.getId())) {
-                list.set(i, summary);
-                break;
-            }
-        }
     }
 
     public ResponseEntity<WeeklySummaryViewDto> getWeeklySummary(String email, int weekNumber) {

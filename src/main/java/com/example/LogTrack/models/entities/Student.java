@@ -12,11 +12,7 @@ public class Student extends AppUser {
     private String matricNumber;
 
     @Getter
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<LogEntry> logEntries;
-
-    @Getter
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WeeklySummary> weeklySummaries;
 
     @ManyToOne

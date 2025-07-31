@@ -15,9 +15,6 @@ public class LogEntry {
     private Long id;
     @Column(name = "date")
     private LocalDate date;
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
     @Column(name = "status")
     private EntryStatus status;
     @Column(name = "activityDescrption")

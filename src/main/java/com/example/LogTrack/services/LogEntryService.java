@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
-public interface StudentService {
+public interface LogEntryService {
     ResponseEntity<String> createLogEntry(LogEntryCreationDto logEntryCreationDto, String email);
 
     ResponseEntity<DailyEntrySummary> viewLogEntry(int weekNumber, int dayNo, String email);

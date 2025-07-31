@@ -10,7 +10,7 @@ import com.example.LogTrack.models.entities.WeeklySummary;
 import com.example.LogTrack.repositories.LogEntryRepository;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.WeeklySummaryRepository;
-import com.example.LogTrack.services.StudentService;
+import com.example.LogTrack.services.LogEntryService;
 import com.example.LogTrack.services.WeeklySummaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class StudentServiceImpl implements StudentService {
+public class LogEntryServiceImpl implements LogEntryService {
     private final StudentRepository studentRepository;
     private final WeeklySummaryService weeklySummaryService;
     private final WeeklySummaryRepository weeklySummaryRepository;
     private final LogEntryRepository logEntryRepository;
 
     @Autowired
-    public StudentServiceImpl(StudentRepository studentRepository, WeeklySummaryService weeklySummaryService, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository) {
+    public LogEntryServiceImpl(StudentRepository studentRepository, WeeklySummaryService weeklySummaryService, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository) {
         this.studentRepository = studentRepository;
         this.weeklySummaryService = weeklySummaryService;
         this.weeklySummaryRepository = weeklySummaryRepository;
@@ -44,7 +44,6 @@ public class StudentServiceImpl implements StudentService {
         }
         LogEntry logEntry = new LogEntry();
         logEntry.setDate(LocalDate.now());
-        logEntry.setStudent(student);
         logEntry.setStatus(EntryStatus.PENDING);
         logEntry.setActivityDescription(logEntryCreationDto.getActivityDescription());
         studentRepository.save(weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student));
@@ -66,8 +65,8 @@ public class StudentServiceImpl implements StudentService {
         DailyEntrySummary dailyEntrySummary = new DailyEntrySummary();
         dailyEntrySummary.setDate(logEntry.getDate());
         dailyEntrySummary.setActivityDescription(logEntry.getActivityDescription());
-        dailyEntrySummary.setStudentName(logEntry.getStudent().getName());
-        dailyEntrySummary.setMatricNumber(logEntry.getStudent().getMatricNumber());
+        dailyEntrySummary.setStudentName(weeklySummary.getStudent().getName());
+        dailyEntrySummary.setMatricNumber(weeklySummary.getStudent().getMatricNumber());
         dailyEntrySummary.setId(logEntry.getId());
         return ResponseEntity.status(HttpStatus.OK).body(dailyEntrySummary);
     }
@@ -127,15 +126,7 @@ public class StudentServiceImpl implements StudentService {
         if (!logEntry.getStatus().equals(EntryStatus.PENDING)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only PENDING entries can be deleted.");
         }
-
-        weeklySummary.getEntries().remove(logEntry);
-        logEntry.setWeeklySummary(null);
-        student.getLogEntries().remove(logEntry);
-        logEntry.setStudent(null);
-
         logEntryRepository.delete(logEntry);
-        weeklySummaryRepository.save(weeklySummary);
-        studentRepository.save(student); // only if you removed logEntry from student side
         return ResponseEntity.ok("Log entry deleted successfully.");
     }
 

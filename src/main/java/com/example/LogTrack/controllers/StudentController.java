@@ -4,7 +4,7 @@ import com.example.LogTrack.models.dtos.LogEntries.DailyEntrySummary;
 import com.example.LogTrack.models.dtos.LogEntries.LogEntryCreationDto;
 import com.example.LogTrack.models.dtos.LogEntries.LogEntryRequestDto;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
-import com.example.LogTrack.services.StudentService;
+import com.example.LogTrack.services.LogEntryService;
 import com.example.LogTrack.services.WeeklySummaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +16,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/student")
 public class StudentController{
-    private final StudentService  studentService;
+    private final LogEntryService logEntryService;
     private final WeeklySummaryService weeklySummaryService;
 
     @Autowired
-    public StudentController(StudentService studentService, WeeklySummaryService weeklySummaryService) {
-        this.studentService = studentService;
+    public StudentController(LogEntryService logEntryService, WeeklySummaryService weeklySummaryService) {
+        this.logEntryService = logEntryService;
         this.weeklySummaryService = weeklySummaryService;
     }
 
@@ -29,7 +29,7 @@ public class StudentController{
     public ResponseEntity<String> createLogEntry(@RequestBody LogEntryCreationDto logEntryCreationDto,
                                                  Authentication authentication){
         String email = authentication.getName();
-        return studentService.createLogEntry(logEntryCreationDto, email);
+        return logEntryService.createLogEntry(logEntryCreationDto, email);
     }
 
     @GetMapping("/entry/view")
@@ -37,7 +37,7 @@ public class StudentController{
                                                           @RequestParam int dayNo,
                                                           Authentication authentication){
         String email = authentication.getName();
-        return studentService.viewLogEntry(weekNumber, dayNo, email);
+        return logEntryService.viewLogEntry(weekNumber, dayNo, email);
     }
 
     @PatchMapping("/entry/update/{id}")
@@ -45,7 +45,7 @@ public class StudentController{
                                                  @RequestBody Map<String,Object> updates,
                                                  Authentication authentication){
         String email = authentication.getName();
-        return studentService.updateLogEntry(email, id, updates);
+        return logEntryService.updateLogEntry(email, id, updates);
     }
 
     @DeleteMapping("/entry/delete/{id}")
@@ -53,7 +53,7 @@ public class StudentController{
                                                  Authentication authentication,
                                                  LogEntryRequestDto logEntryRequestDto){
         String email = authentication.getName();
-        return studentService.deleteLogEntry(id, email, logEntryRequestDto);
+        return logEntryService.deleteLogEntry(id, email, logEntryRequestDto);
     }
 
     @GetMapping("/weeklySummary")
