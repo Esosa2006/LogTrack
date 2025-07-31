@@ -77,10 +77,7 @@ public class LogEntryServiceImpl implements LogEntryService {
         if (student == null) {
             throw new RuntimeException("Student with email " + email + " not found!");
         }
-        LogEntry logEntry = logEntryRepository.findByStudentAndId(student, id);
-        if (logEntry == null) {
-            throw new RuntimeException("Log entry for " + student.getName() + " with id " + id + " not found!");
-        }
+        LogEntry logEntry = logEntryRepository.findById(id).orElseThrow(() -> new RuntimeException("Log entry for " + student.getName() + " with id " + id + " not found!"));
         if (logEntry.getStatus().equals(EntryStatus.PENDING)) {
             if (updates.containsKey("activityDescription")) {
                 logEntry.setActivityDescription((String) updates.get("activityDescription"));

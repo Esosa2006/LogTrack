@@ -57,7 +57,7 @@ public class SupervisorServiceImpl implements SupervisorService {
             List<SupervisorLogEntryView> logEntryViewList = new ArrayList<>();
             for (WeeklySummary weeklySummary : student.getWeeklySummaries()){
                 for (LogEntry entry : weeklySummary.getEntries()){
-                    logEntryViewList.add(logEntryForSupervisorMapper.toLogEntryView(entry));
+                    logEntryViewList.add(logEntryForSupervisorMapper.toLogEntryView(entry, weeklySummary));
                 }
             }
             return ResponseEntity.ok(logEntryViewList);

@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LogEntryRepository extends JpaRepository<LogEntry, Long> {
-    LogEntry findByStudentAndId(Student student, Long id);
 }
