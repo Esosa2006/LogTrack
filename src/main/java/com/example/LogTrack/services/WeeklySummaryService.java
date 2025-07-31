@@ -89,7 +89,7 @@ public class WeeklySummaryService {
     private WeeklySummary generateWeeklySummaryText(WeeklySummary weeklySummary) {
         List<EntryDisplayDto> entries = new ArrayList<>();
         for (LogEntry logEntry : weeklySummary.getEntries()) {
-            EntryDisplayDto entryDisplayDto = logEntryForSummaryMapper.toEntryDisplayDto(logEntry);
+            EntryDisplayDto entryDisplayDto = logEntryForSummaryMapper.toEntryDisplayDto(logEntry, weeklySummary);
             entries.add(entryDisplayDto);
         }
         String summary = entries.toString();

@@ -1,5 +1,6 @@
 package com.example.LogTrack.config;
 
+import com.example.LogTrack.security.JWTFilter;
 import com.example.LogTrack.security.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,14 +16,17 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
+    private final JWTFilter jwtFilter;
     private final MyUserDetailsService myUserDetailsService;
 
     @Autowired
-    public SecurityConfig(MyUserDetailsService myUserDetailsService) {
+    public SecurityConfig(JWTFilter jwtFilter, MyUserDetailsService myUserDetailsService) {
+        this.jwtFilter = jwtFilter;
         this.myUserDetailsService = myUserDetailsService;
     }
 
@@ -34,6 +38,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

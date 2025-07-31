@@ -2,7 +2,9 @@ package com.example.LogTrack.models.dtos.authDtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
+@Data
 public class LoginDto {
     @Email(message = "Invalid email format!")
     @NotBlank(message = "Email is required!")

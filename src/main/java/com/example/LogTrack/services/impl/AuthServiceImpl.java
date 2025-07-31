@@ -1,16 +1,21 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.Role;
+import com.example.LogTrack.models.dtos.authDtos.LoginDto;
 import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.Supervisor;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.SupervisorRepository;
+import com.example.LogTrack.security.JWTService;
 import com.example.LogTrack.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +23,15 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
     private final StudentRepository studentRepository;
     private final SupervisorRepository supervisorRepository;
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
 
     @Autowired
-    public AuthServiceImpl(StudentRepository studentRepository, SupervisorRepository supervisorRepository) {
+    public AuthServiceImpl(StudentRepository studentRepository, SupervisorRepository supervisorRepository, AuthenticationManager authenticationManager, JWTService jwtService) {
         this.studentRepository = studentRepository;
         this.supervisorRepository = supervisorRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -35,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Passwords do not match");
         }
         Student newStudent = createStudent(signUpRequest);
+        studentRepository.save(newStudent);
         return ResponseEntity.status(HttpStatus.CREATED).body("Student Registration successful!");
     }
 
@@ -47,6 +57,15 @@ public class AuthServiceImpl implements AuthService {
         Supervisor newSupervisor = createSupervisor(supervisorSignUpRequest);
         supervisorRepository.save(newSupervisor);
         return ResponseEntity.status(HttpStatus.CREATED).body("Supervisor Registration successful!");
+    }
+
+    @Override
+    public ResponseEntity<String> login(LoginDto loginDto) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+        if (!authentication.isAuthenticated()) {
+            throw new RuntimeException("Authentication failed");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(jwtService.generateToken(loginDto.getEmail()));
     }
 
     private static Student createStudent(StudentSignUpRequest studentSignUpRequest) {

@@ -4,6 +4,7 @@ import com.example.LogTrack.models.dtos.authDtos.LoginDto;
 import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
 import com.example.LogTrack.services.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,15 +23,17 @@ public class AuthController {
     }
 
     @PostMapping("/signUp/student")
-    public ResponseEntity<String> studentSignUp(@RequestBody StudentSignUpRequest signUpRequest) {
+    public ResponseEntity<String> studentSignUp(@Valid @RequestBody StudentSignUpRequest signUpRequest) {
         return authService.studentSignUp(signUpRequest);
     }
 
     @PostMapping("/signUp/supervisor")
-    public ResponseEntity<String> supervisorSignUp(@RequestBody SupervisorSignUpRequest supervisorSignUpRequest) {
+    public ResponseEntity<String> supervisorSignUp(@Valid @RequestBody SupervisorSignUpRequest supervisorSignUpRequest) {
         return authService.supervisorSignUp(supervisorSignUpRequest);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(LoginDto)
+    public ResponseEntity<String> login(@Valid @RequestBody LoginDto loginDto){
+        return authService.login(loginDto);
+    }
 }
