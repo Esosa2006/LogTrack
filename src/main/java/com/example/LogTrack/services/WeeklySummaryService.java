@@ -35,7 +35,7 @@ public class WeeklySummaryService {
     public Student addEntryToWeeklySummary(LogEntry logEntry, int weekNumber, Student student) {
         List<WeeklySummary> summaries = student.getWeeklySummaries();
 
-        if (summaries.isEmpty()) {
+        if (!hasIncompleteWeeklySummary(summaries)) {
             WeeklySummary newSummary = new WeeklySummary();
             newSummary.setStudent(student);
             newSummary.setWeekNumber(weekNumber);
@@ -44,7 +44,7 @@ public class WeeklySummaryService {
             weeklySummaryRepository.save(newSummary);
         }
 
-        else if (isNotEmpty(summaries)) {
+        else{
             WeeklySummary targetSummary = getWeeklySummaryNotUpToFive(summaries);
             if (targetSummary != null) {
                 targetSummary.getEntries().add(logEntry);
@@ -70,7 +70,7 @@ public class WeeklySummaryService {
         return null;
     }
 
-    private boolean isNotEmpty(List<WeeklySummary> weeklySummaries){
+    private boolean hasIncompleteWeeklySummary(List<WeeklySummary> weeklySummaries){
         for (WeeklySummary summary : weeklySummaries){
             if (summary.getEntries().size() < 6){
                 return true;

@@ -4,6 +4,7 @@ import com.example.LogTrack.utils.SecretKeyGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class JWTService {
     private final String secretKey = SecretKeyGenerator.generateSecretKey();
     public String generateToken(String email) {
@@ -21,8 +23,9 @@ public class JWTService {
         return Jwts.builder()
                 .claims()
                 .add(claims)
+                .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis()* 36000) )
+                .expiration(new Date(System.currentTimeMillis()* 36000))
                 .and()
                 .signWith(getKey())
                 .compact();
@@ -39,13 +42,14 @@ public class JWTService {
                 .getPayload();
     }
     public String getUsername(String token) {
+        log.info(getClaims(token).getSubject());
         return getClaims(token).getSubject();
     }
     public Date getExpiration(String token) {
         return getClaims(token).getExpiration();
     }
-    public boolean isExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
+    private boolean isExpired(String token){
+        return getExpiration(token).before(new Date());
     }
     public boolean validateToken(String token, UserDetails userDetails) {
         String email = getUsername(token);

@@ -16,17 +16,17 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/student")
-public class StudentController{
+public class LogEntryController {
     private final LogEntryService logEntryService;
     private final WeeklySummaryService weeklySummaryService;
 
     @Autowired
-    public StudentController(LogEntryService logEntryService, WeeklySummaryService weeklySummaryService) {
+    public LogEntryController(LogEntryService logEntryService, WeeklySummaryService weeklySummaryService) {
         this.logEntryService = logEntryService;
         this.weeklySummaryService = weeklySummaryService;
     }
 
-    @PostMapping("/entity/create")
+    @PostMapping("/entry/create")
     public ResponseEntity<String> createLogEntry(@Valid @RequestBody LogEntryCreationDto logEntryCreationDto,
                                                  Authentication authentication){
         String email = authentication.getName();

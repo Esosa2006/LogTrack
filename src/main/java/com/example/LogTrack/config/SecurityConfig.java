@@ -35,7 +35,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/student/**", "/supervisor/**", "/auth/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/student/**").hasRole("STUDENT")
+                        .requestMatchers("/supervisor/**").hasRole("SUPERVISOR")
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .httpBasic(Customizer.withDefaults())
