@@ -19,6 +19,7 @@ public class Student extends AppUser {
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WeeklySummary> weeklySummaries = new ArrayList<>();
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "supervisor_id")
     private Supervisor supervisor;

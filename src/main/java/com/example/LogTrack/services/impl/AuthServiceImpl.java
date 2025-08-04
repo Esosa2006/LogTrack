@@ -9,6 +9,7 @@ import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.Supervisor;
+import com.example.LogTrack.repositories.AdminRepository;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.SupervisorRepository;
 import com.example.LogTrack.security.JWTService;
@@ -28,13 +29,15 @@ public class AuthServiceImpl implements AuthService {
     private final SupervisorRepository supervisorRepository;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final AdminRepository adminRepository;
 
     @Autowired
-    public AuthServiceImpl(StudentRepository studentRepository, SupervisorRepository supervisorRepository, AuthenticationManager authenticationManager, JWTService jwtService) {
+    public AuthServiceImpl(StudentRepository studentRepository, SupervisorRepository supervisorRepository, AuthenticationManager authenticationManager, JWTService jwtService, AdminRepository adminRepository) {
         this.studentRepository = studentRepository;
         this.supervisorRepository = supervisorRepository;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.adminRepository = adminRepository;
     }
 
     @Override
