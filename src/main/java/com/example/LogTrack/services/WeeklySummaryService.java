@@ -9,6 +9,7 @@ import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.WeeklySummary;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.WeeklySummaryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class WeeklySummaryService {
     private final WeeklySummaryRepository weeklySummaryRepository;
@@ -93,7 +95,12 @@ public class WeeklySummaryService {
             EntryDisplayDto entryDisplayDto = logEntryForSummaryMapper.toEntryDisplayDto(logEntry, weeklySummary);
             entries.add(entryDisplayDto);
         }
-        String summary = entries.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (EntryDisplayDto logEntry : entries) {
+            stringBuilder.append(logEntry.getStudentName()).append("\n").append(logEntry.getDate()).append("\n").append(logEntry.getActivityDescription()).append("\n");
+        }
+        String summary = stringBuilder.toString();
+        log.info(summary);
         weeklySummary.setSummaryText(summary);
         return weeklySummary;
     }
