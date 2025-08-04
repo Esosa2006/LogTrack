@@ -90,18 +90,17 @@ public class WeeklySummaryService {
     }
 
     private WeeklySummary generateWeeklySummaryText(WeeklySummary weeklySummary) {
-        List<EntryDisplayDto> entries = new ArrayList<>();
-        for (LogEntry logEntry : weeklySummary.getEntries()) {
-            EntryDisplayDto entryDisplayDto = logEntryForSummaryMapper.toEntryDisplayDto(logEntry, weeklySummary);
-            entries.add(entryDisplayDto);
+        StringBuilder finalSummary = new StringBuilder();
+        for (LogEntry entry : weeklySummary.getEntries()){
+            String eachSummary = String.format("""
+                %s,
+                %s,
+                %s,
+                ------------
+                """, entry.getDate(), weeklySummary.getStudent().getName(), entry.getActivityDescription());
+            finalSummary.append(eachSummary);
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (EntryDisplayDto logEntry : entries) {
-            stringBuilder.append(logEntry.getStudentName()).append("\n").append(logEntry.getDate()).append("\n").append(logEntry.getActivityDescription()).append("\n");
-        }
-        String summary = stringBuilder.toString();
-        log.info(summary);
-        weeklySummary.setSummaryText(summary);
+        weeklySummary.setSummaryText(finalSummary.toString());
         return weeklySummary;
     }
 }
