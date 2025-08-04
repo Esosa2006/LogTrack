@@ -1,6 +1,8 @@
 package com.example.LogTrack.controllers;
 
 import com.example.LogTrack.models.dtos.AssignmentDto;
+import com.example.LogTrack.models.dtos.adminViews.StudentViewDto;
+import com.example.LogTrack.models.dtos.adminViews.SupervisorDto;
 import com.example.LogTrack.models.entities.Supervisor;
 import com.example.LogTrack.services.AdminService;
 import jakarta.validation.Valid;
@@ -26,7 +28,12 @@ public class AdminController {
     }
 
     @GetMapping("/supervisors")
-    public List<Supervisor> viewAllSupervisors(){
-        return
+    public List<SupervisorDto> viewAllSupervisors(){
+        return adminService.viewAllSupervisors();
+    }
+
+    @GetMapping("/students")
+    public List<StudentViewDto> viewAllStudents(){
+        return adminService.viewAllStudents();
     }
 }

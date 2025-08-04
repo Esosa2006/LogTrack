@@ -21,6 +21,15 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(z, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(value = EmptyRepoException.class)
+    public ResponseEntity<Object> handleEmptyRepoException(EmptyRepoException e){
+        Exception z = new Exception(
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(z, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(value = EmailAlreadyInUseException.class)
     public ResponseEntity<Object> handleEmailAlreadyInUseException(EmailAlreadyInUseException e) {
         Exception z = new Exception(
