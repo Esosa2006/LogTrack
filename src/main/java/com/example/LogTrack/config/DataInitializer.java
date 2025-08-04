@@ -12,12 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class DataInitializer {
     private final AdminRepository adminRepository;
-    private final BCryptPasswordEncoder encoder;
 
     @Autowired
-    public DataInitializer(AdminRepository adminRepository, BCryptPasswordEncoder encoder) {
+    public DataInitializer(AdminRepository adminRepository) {
         this.adminRepository = adminRepository;
-        this.encoder = encoder;
     }
 
     @Bean
@@ -25,6 +23,7 @@ public class DataInitializer {
         return args -> {
             String adminEmail = "admin@logtrack.com";
             if (!adminRepository.existsByEmail(adminEmail)) {
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
                 Admin admin = new Admin();
                 admin.setEmail(adminEmail);
                 admin.setName("Admin");
