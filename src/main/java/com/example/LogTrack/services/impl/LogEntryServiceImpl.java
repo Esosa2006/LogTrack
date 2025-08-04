@@ -47,8 +47,7 @@ public class LogEntryServiceImpl implements LogEntryService {
         logEntry.setDate(LocalDate.now());
         logEntry.setStatus(EntryStatus.PENDING);
         logEntry.setActivityDescription(logEntryCreationDto.getActivityDescription());
-        studentRepository.save(weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student));
-        logEntryRepository.save(logEntry);
+        weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student);
         return ResponseEntity.status(HttpStatus.CREATED).body("Entry successfully created");
     }
 
@@ -61,6 +60,9 @@ public class LogEntryServiceImpl implements LogEntryService {
         }
         if (dayNo < 1 || dayNo > 7) {
             throw new InvalidDayNumberException("Invalid day number! Pick between days 1-6");
+        }
+        if(weeklySummary.getEntries().size() < dayNo){
+            throw new NoLogEntryFoundException("No log entry was found!");
         }
         LogEntry logEntry = weeklySummary.getEntries().get(dayNo - 1);
         DailyEntrySummary dailyEntrySummary = new DailyEntrySummary();

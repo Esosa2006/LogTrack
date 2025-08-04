@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Table
@@ -22,7 +23,7 @@ public class WeeklySummary {
     @JoinColumn(name = "student_id")
     private Student student;
     @OneToMany(mappedBy = "weeklySummary", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LogEntry> entries;
+    private List<LogEntry> entries = new ArrayList<>();
     @Column(name = "summaryText")
     private String summaryText;
 }

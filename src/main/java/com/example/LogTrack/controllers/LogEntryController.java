@@ -34,11 +34,10 @@ public class LogEntryController {
     }
 
     @GetMapping("/entry/view")
-    public ResponseEntity<DailyEntrySummary> viewLogEntry(@RequestParam int weekNumber,
-                                                          @RequestParam int dayNo,
+    public ResponseEntity<DailyEntrySummary> viewLogEntry(@Valid @RequestBody LogEntryRequestDto logEntryRequestDto,
                                                           Authentication authentication){
         String email = authentication.getName();
-        return logEntryService.viewLogEntry(weekNumber, dayNo, email);
+        return logEntryService.viewLogEntry(logEntryRequestDto.getWeekNo(), logEntryRequestDto.getDayNo(), email);
     }
 
     @PatchMapping("/entry/update/{id}")

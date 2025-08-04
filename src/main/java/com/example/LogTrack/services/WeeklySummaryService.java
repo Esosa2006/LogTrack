@@ -40,30 +40,31 @@ public class WeeklySummaryService {
             newSummary.setStudent(student);
             newSummary.setWeekNumber(weekNumber);
             newSummary.getEntries().add(logEntry);
+            logEntry.setWeeklySummary(newSummary);
             summaries.add(newSummary);
-            weeklySummaryRepository.save(newSummary);
         }
 
         else{
             WeeklySummary targetSummary = getWeeklySummaryNotUpToFive(summaries);
             if (targetSummary != null) {
                 targetSummary.getEntries().add(logEntry);
-                weeklySummaryRepository.save(targetSummary);
+                logEntry.setWeeklySummary(targetSummary);
             } else {
                 WeeklySummary newSummary = new WeeklySummary();
                 newSummary.setStudent(student);
                 newSummary.setWeekNumber(summaries.size() + 1);
                 newSummary.getEntries().add(logEntry);
+                logEntry.setWeeklySummary(newSummary);
                 summaries.add(newSummary);
-                weeklySummaryRepository.save(newSummary);
             }
         }
-        return student;
+        return studentRepository.save(student);
     }
+
 
     private WeeklySummary getWeeklySummaryNotUpToFive(List<WeeklySummary> weeklySummaries){
         for (WeeklySummary summary : weeklySummaries){
-            if (summary.getEntries().size() < 6){
+            if (summary.getEntries().size() < 7){
                 return summary;
             }
         }
