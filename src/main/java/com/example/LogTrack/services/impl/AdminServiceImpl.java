@@ -1,8 +1,6 @@
 package com.example.LogTrack.services.impl;
 
-import com.example.LogTrack.exceptions.exceptions.EmptyRepoException;
-import com.example.LogTrack.exceptions.exceptions.StudentNotFoundException;
-import com.example.LogTrack.exceptions.exceptions.SupervisorNotFoundException;
+import com.example.LogTrack.exceptions.exceptions.*;
 import com.example.LogTrack.mapper.ToStudentViewDtoMapper;
 import com.example.LogTrack.mapper.ToSupervisorDtoMapper;
 import com.example.LogTrack.models.dtos.AssignmentDto;
@@ -19,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -65,5 +64,73 @@ public class AdminServiceImpl implements AdminService {
             throw new EmptyRepoException("No students found!");
         }
         return studentRepository.findAll().stream().map(toStudentViewDtoMapper::toDto).toList();
+    }
+
+    @Override
+    public List<StudentViewDto> searchForStudentsByField(Map<String, Object> search){
+        if (search.size() > 1){
+            throw new OnlyOneFieldAllowedException("Only one field can be passed");
+        }
+        if (search.containsKey("name")) {
+            List<StudentViewDto> list = studentRepository.findAllByName(search.get("name").toString()).stream().map(toStudentViewDtoMapper::toDto).toList();
+            emptyListCheck(list);
+            return list;
+        }
+        else if (search.containsKey("email")){
+            List<StudentViewDto> list = studentRepository.findAllByEmail(search.get("email").toString()).stream().map(toStudentViewDtoMapper::toDto).toList();
+            emptyListCheck(list);
+            return list;
+        }
+        else if (search.containsKey("matricNumber")){
+            List<StudentViewDto> list =  studentRepository.findAllByMatricNumber(search.get("matricNumber").toString()).stream().map(toStudentViewDtoMapper::toDto).toList();
+            emptyListCheck(list);
+            return list;
+        }
+        else if (search.containsKey("supervisorName")){
+            List<StudentViewDto> list =  studentRepository.findAllBySupervisorName(search.get("supervisorName").toString()).stream().map(toStudentViewDtoMapper::toDto).toList();
+            emptyListCheck(list);
+            return list;
+        }
+        else if (search.containsKey("supervisorEmail")){
+            List<StudentViewDto> list =  studentRepository.findAllBySupervisorEmail(search.get("supervisorEmail").toString()).stream().map(toStudentViewDtoMapper::toDto).toList();
+            emptyListCheck(list);
+            return list;
+        }
+        else{
+            throw new FieldNotFoundException("No such field found!");
+        }
+    }
+
+    @Override
+    public List<SupervisorDto> searchForSupervisorByField(Map<String, Object> search) {
+        if (search.size() > 1){
+            throw new OnlyOneFieldAllowedException("Only one field can be passed");
+        }
+
+        if (search.containsKey("name")) {
+            List<SupervisorDto> supervisorList = supervisorRepository.findAllByName(search.get("name").toString()).stream().map(toSupervisorDtoMapper::toDto).toList();
+            emptySupervisorListCheck(supervisorList);
+            return supervisorList;
+        }
+        else if (search.containsKey("email")){
+            List<SupervisorDto> supervisorList = supervisorRepository.findAllByEmail(search.get("email").toString()).stream().map(toSupervisorDtoMapper::toDto).toList();
+            emptySupervisorListCheck(supervisorList);
+            return supervisorList;
+        }
+        else{
+            throw new FieldNotFoundException("No such field found!");
+        }
+    }
+
+    private static void emptyListCheck(List<StudentViewDto> list) {
+        if (list.isEmpty()){
+            throw new EmptyRepoException("No students found!");
+        }
+    }
+
+    private static void emptySupervisorListCheck(List<SupervisorDto> list) {
+        if (list.isEmpty()){
+            throw new EmptyRepoException("No students found!");
+        }
     }
 }

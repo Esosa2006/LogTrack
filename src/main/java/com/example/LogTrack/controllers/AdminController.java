@@ -38,7 +38,14 @@ public class AdminController {
     }
 
     @GetMapping("/student")
-    public List<StudentViewDto> viewStudentByEmail(@RequestBody Map<String, Object> search){
-        return adminService.viewStudentByEmail();
+    public List<StudentViewDto> searchForStudentsByField(@RequestBody Map<String, Object> search){
+        return adminService.searchForStudentsByField(search);
     }
+
+    @GetMapping("/supervisor")
+    public List<SupervisorDto> searchForSupervisorsByField(@RequestBody Map<String, Object> search){
+        return adminService.searchForSupervisorByField(search);
+    }
+
+
 }
