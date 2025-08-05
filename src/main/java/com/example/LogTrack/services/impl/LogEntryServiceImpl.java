@@ -68,8 +68,8 @@ public class LogEntryServiceImpl implements LogEntryService {
         DailyLogEntryDto dailyLogEntryDto = new DailyLogEntryDto();
         dailyLogEntryDto.setDate(logEntry.getDate());
         dailyLogEntryDto.setActivityDescription(logEntry.getActivityDescription());
-        dailyLogEntryDto.setStudentName(weeklySummary.getStudent().getName());
-        dailyLogEntryDto.setMatricNumber(weeklySummary.getStudent().getMatricNumber());
+        dailyLogEntryDto.setComment(logEntry.getComment());
+        dailyLogEntryDto.setStatus(logEntry.getStatus());
         dailyLogEntryDto.setId(logEntry.getId());
         return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDto);
     }
