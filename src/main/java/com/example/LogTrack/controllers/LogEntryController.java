@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -61,6 +62,13 @@ public class LogEntryController {
                                                                  @RequestParam int weekNumber){
         String email = authentication.getName();
         return weeklySummaryService.getWeeklySummary(email, weekNumber);
+    }
+
+    @GetMapping("/entries")
+    public ResponseEntity<List<DailyLogEntryDto>> getByStatus(Authentication authentication,
+                                                              @RequestParam String status){
+        String email = authentication.getName();
+        return logEntryService.getByStatus(email, status);
     }
 
 

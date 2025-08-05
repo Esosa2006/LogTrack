@@ -144,5 +144,4 @@ public class SupervisorServiceImpl implements SupervisorService {
         }
         return ResponseEntity.status(HttpStatus.OK).body(supervisorAssignedStudentDtoList);
     }
-
 }

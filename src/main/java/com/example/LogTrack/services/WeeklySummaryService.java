@@ -5,6 +5,7 @@ import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.WeeklySummary;
+import com.example.LogTrack.repositories.LogEntryRepository;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.WeeklySummaryRepository;
 import lombok.extern.slf4j.Slf4j;

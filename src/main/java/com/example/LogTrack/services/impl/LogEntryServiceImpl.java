@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -130,6 +131,24 @@ public class LogEntryServiceImpl implements LogEntryService {
         return ResponseEntity.ok("Log entry deleted successfully.");
     }
 
-
-
+    @Override
+    public ResponseEntity<List<DailyLogEntryDto>> getByStatus(String email, String status) {
+        Student student = studentRepository.findByEmail(email);
+        if (student == null) {
+            throw new StudentNotFoundException("Student with email " + email + " not found!");
+        }
+        EntryStatus entryStatus = EntryStatus.valueOf(status);
+        List<LogEntry> logEntryList = logEntryRepository.findByStatusAndStudentId(entryStatus, student.getId());
+        List<DailyLogEntryDto> dailyLogEntryDtoList = new ArrayList<>();
+        for (LogEntry logEntry : logEntryList){
+            DailyLogEntryDto dailyLogEntryDto = new DailyLogEntryDto();
+            dailyLogEntryDto.setDate(logEntry.getDate());
+            dailyLogEntryDto.setActivityDescription(logEntry.getActivityDescription());
+            dailyLogEntryDto.setComment(logEntry.getComment());
+            dailyLogEntryDto.setStatus(logEntry.getStatus());
+            dailyLogEntryDto.setId(logEntry.getId());
+            dailyLogEntryDtoList.add(dailyLogEntryDto);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDtoList);
+    }
 }
