@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 public class Student extends AppUser {
 
-    @Column(name = "matricNumber")
+    @Column(name = "matricNumber", unique = true)
     private String matricNumber;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)

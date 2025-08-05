@@ -14,4 +14,6 @@ public interface AdminService {
     List<SupervisorDto> viewAllSupervisors();
 
     List<StudentViewDto> viewAllStudents();
+
+    List<StudentViewDto> viewStudentByEmail();
 }

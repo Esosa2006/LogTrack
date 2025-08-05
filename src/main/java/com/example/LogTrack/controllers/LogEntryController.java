@@ -70,7 +70,4 @@ public class LogEntryController {
         String email = authentication.getName();
         return logEntryService.getByStatus(email, status);
     }
-
-
-
 }

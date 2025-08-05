@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
@@ -34,5 +35,10 @@ public class AdminController {
     @GetMapping("/students")
     public List<StudentViewDto> viewAllStudents(){
         return adminService.viewAllStudents();
+    }
+
+    @GetMapping("/student")
+    public List<StudentViewDto> viewStudentByEmail(@RequestBody Map<String, Object> search){
+        return adminService.viewStudentByEmail();
     }
 }
