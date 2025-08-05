@@ -5,8 +5,10 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class EntryDisplayDto {
+public class DailyLogEntryDto {
+    private Long id;
     private LocalDate date;
     private String studentName;
+    private String matricNumber;
     private String activityDescription;
 }

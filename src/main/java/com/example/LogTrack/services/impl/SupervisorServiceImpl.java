@@ -1,9 +1,14 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.EntryStatus;
+import com.example.LogTrack.exceptions.exceptions.StudentNotFoundException;
+import com.example.LogTrack.exceptions.exceptions.SupervisorNotFoundException;
 import com.example.LogTrack.mapper.LogEntryForSupervisorMapper;
+import com.example.LogTrack.mapper.StudentToSupervisorViewMapper;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
 import com.example.LogTrack.models.dtos.EvaluationDto;
+import com.example.LogTrack.models.dtos.SupervisorAssignedStudentDto;
+import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.logEntries.SupervisorLogEntryView;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.LogEntry;
@@ -31,15 +36,17 @@ public class SupervisorServiceImpl implements SupervisorService {
     private final WeeklySummaryRepository weeklySummaryRepository;
     private final LogEntryRepository logEntryRepository;
     private final SummaryDisplayMapper summaryDisplayMapper;
+    private final StudentToSupervisorViewMapper studentToSupervisorViewMapper;
 
     @Autowired
-    public SupervisorServiceImpl(SupervisorRepository supervisorRepository, StudentRepository studentRepository, LogEntryForSupervisorMapper logEntryForSupervisorMapper, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository, SummaryDisplayMapper summaryDisplayMapper) {
+    public SupervisorServiceImpl(SupervisorRepository supervisorRepository, StudentRepository studentRepository, LogEntryForSupervisorMapper logEntryForSupervisorMapper, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository, SummaryDisplayMapper summaryDisplayMapper, StudentToSupervisorViewMapper studentToSupervisorViewMapper) {
         this.supervisorRepository = supervisorRepository;
         this.studentRepository = studentRepository;
         this.logEntryForSupervisorMapper = logEntryForSupervisorMapper;
         this.weeklySummaryRepository = weeklySummaryRepository;
         this.logEntryRepository = logEntryRepository;
         this.summaryDisplayMapper = summaryDisplayMapper;
+        this.studentToSupervisorViewMapper = studentToSupervisorViewMapper;
     }
 
     @Override
@@ -119,6 +126,23 @@ public class SupervisorServiceImpl implements SupervisorService {
         }
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNo, student);
         return ResponseEntity.status(HttpStatus.OK).body(summaryDisplayMapper.toWeeklySummary(weeklySummary));
+    }
+
+    @Override
+    public ResponseEntity<List<SupervisorAssignedStudentDto>> viewAssignedStudents(String email) {
+        Supervisor supervisor = supervisorRepository.findByEmail(email);
+        if (supervisor == null) {
+            throw new SupervisorNotFoundException("Supervisor not found");
+        }
+        List<Student> students = supervisor.getStudents();
+        if (students.isEmpty()) {
+            throw new StudentNotFoundException("No students found");
+        }
+        List<SupervisorAssignedStudentDto> supervisorAssignedStudentDtoList = new ArrayList<>();
+        for (Student student : students) {
+            supervisorAssignedStudentDtoList.add(studentToSupervisorViewMapper.toSupervisorAssignedStudentDto(student));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(supervisorAssignedStudentDtoList);
     }
 
 }

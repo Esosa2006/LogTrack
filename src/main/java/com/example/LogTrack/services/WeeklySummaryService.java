@@ -1,8 +1,6 @@
 package com.example.LogTrack.services;
 
-import com.example.LogTrack.mapper.LogEntryForSummaryMapper;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
-import com.example.LogTrack.models.dtos.logEntries.EntryDisplayDto;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;
@@ -15,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -23,14 +20,12 @@ import java.util.List;
 public class WeeklySummaryService {
     private final WeeklySummaryRepository weeklySummaryRepository;
     private final StudentRepository studentRepository;
-    private final LogEntryForSummaryMapper logEntryForSummaryMapper;
     private final SummaryDisplayMapper summaryDisplayMapper;
 
     @Autowired
-    public WeeklySummaryService(WeeklySummaryRepository weeklySummaryRepository, StudentRepository studentRepository, LogEntryForSummaryMapper logEntryForSummaryMapper, SummaryDisplayMapper summaryDisplayMapper) {
+    public WeeklySummaryService(WeeklySummaryRepository weeklySummaryRepository, StudentRepository studentRepository, SummaryDisplayMapper summaryDisplayMapper) {
         this.weeklySummaryRepository = weeklySummaryRepository;
         this.studentRepository = studentRepository;
-        this.logEntryForSummaryMapper = logEntryForSummaryMapper;
         this.summaryDisplayMapper = summaryDisplayMapper;
     }
 

@@ -1,8 +1,8 @@
 package com.example.LogTrack.controllers;
 
-import com.example.LogTrack.models.dtos.logEntries.DailyEntrySummary;
+import com.example.LogTrack.models.dtos.logEntries.DailyLogEntryDto;
 import com.example.LogTrack.models.dtos.logEntries.LogEntryCreationDto;
-import com.example.LogTrack.models.dtos.logEntries.LogEntryRequestDto;
+import com.example.LogTrack.models.dtos.logEntries.LogEntryQueryDto;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.services.LogEntryService;
 import com.example.LogTrack.services.WeeklySummaryService;
@@ -34,10 +34,10 @@ public class LogEntryController {
     }
 
     @GetMapping("/entry/view")
-    public ResponseEntity<DailyEntrySummary> viewLogEntry(@Valid @RequestBody LogEntryRequestDto logEntryRequestDto,
-                                                          Authentication authentication){
+    public ResponseEntity<DailyLogEntryDto> viewLogEntry(@Valid @RequestBody LogEntryQueryDto logEntryQueryDto,
+                                                         Authentication authentication){
         String email = authentication.getName();
-        return logEntryService.viewLogEntry(logEntryRequestDto.getWeekNo(), logEntryRequestDto.getDayNo(), email);
+        return logEntryService.viewLogEntry(logEntryQueryDto.getWeekNo(), logEntryQueryDto.getDayNo(), email);
     }
 
     @PatchMapping("/entry/update/{id}")
@@ -51,9 +51,9 @@ public class LogEntryController {
     @DeleteMapping("/entry/delete/{id}")
     public ResponseEntity<String> deleteLogEntry(@PathVariable Long id,
                                                  Authentication authentication,
-                                                 LogEntryRequestDto logEntryRequestDto){
+                                                 LogEntryQueryDto logEntryQueryDto){
         String email = authentication.getName();
-        return logEntryService.deleteLogEntry(id, email, logEntryRequestDto);
+        return logEntryService.deleteLogEntry(id, email, logEntryQueryDto);
     }
 
     @GetMapping("/weeklySummary")

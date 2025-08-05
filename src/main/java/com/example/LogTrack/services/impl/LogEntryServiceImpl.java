@@ -2,9 +2,9 @@ package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.EntryStatus;
 import com.example.LogTrack.exceptions.exceptions.*;
-import com.example.LogTrack.models.dtos.logEntries.DailyEntrySummary;
+import com.example.LogTrack.models.dtos.logEntries.DailyLogEntryDto;
 import com.example.LogTrack.models.dtos.logEntries.LogEntryCreationDto;
-import com.example.LogTrack.models.dtos.logEntries.LogEntryRequestDto;
+import com.example.LogTrack.models.dtos.logEntries.LogEntryQueryDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.WeeklySummary;
@@ -52,7 +52,7 @@ public class LogEntryServiceImpl implements LogEntryService {
     }
 
     @Override
-    public ResponseEntity<DailyEntrySummary> viewLogEntry(int weekNumber, int dayNo, String email) {
+    public ResponseEntity<DailyLogEntryDto> viewLogEntry(int weekNumber, int dayNo, String email) {
         Student student = studentRepository.findByEmail(email);
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNumber, student);
         if (weeklySummary == null) {
@@ -65,13 +65,13 @@ public class LogEntryServiceImpl implements LogEntryService {
             throw new NoLogEntryFoundException("No log entry was found!");
         }
         LogEntry logEntry = weeklySummary.getEntries().get(dayNo - 1);
-        DailyEntrySummary dailyEntrySummary = new DailyEntrySummary();
-        dailyEntrySummary.setDate(logEntry.getDate());
-        dailyEntrySummary.setActivityDescription(logEntry.getActivityDescription());
-        dailyEntrySummary.setStudentName(weeklySummary.getStudent().getName());
-        dailyEntrySummary.setMatricNumber(weeklySummary.getStudent().getMatricNumber());
-        dailyEntrySummary.setId(logEntry.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(dailyEntrySummary);
+        DailyLogEntryDto dailyLogEntryDto = new DailyLogEntryDto();
+        dailyLogEntryDto.setDate(logEntry.getDate());
+        dailyLogEntryDto.setActivityDescription(logEntry.getActivityDescription());
+        dailyLogEntryDto.setStudentName(weeklySummary.getStudent().getName());
+        dailyLogEntryDto.setMatricNumber(weeklySummary.getStudent().getMatricNumber());
+        dailyLogEntryDto.setId(logEntry.getId());
+        return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDto);
     }
 
     @Override
@@ -98,23 +98,23 @@ public class LogEntryServiceImpl implements LogEntryService {
     }
 
     @Override
-    public ResponseEntity<String> deleteLogEntry(Long id, String email, LogEntryRequestDto logEntryRequestDto) {
+    public ResponseEntity<String> deleteLogEntry(Long id, String email, LogEntryQueryDto logEntryQueryDto) {
         Student student = studentRepository.findByEmail(email);
         if (student == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found!");
         }
 
-        WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(logEntryRequestDto.getWeekNo(), student);
+        WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(logEntryQueryDto.getWeekNo(), student);
         if (weeklySummary == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Weekly summary not found!");
         }
 
-        int index = logEntryRequestDto.getDayNo() - 1;
+        int index = logEntryQueryDto.getDayNo() - 1;
         List<LogEntry> entries = weeklySummary.getEntries();
         if (index < 0 || index >= entries.size()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid day number!");
         }
-        if (entries.size() < logEntryRequestDto.getDayNo()) {
+        if (entries.size() < logEntryQueryDto.getDayNo()) {
             throw new NoLogEntryFoundException("No log entry for this day.");
         }
 

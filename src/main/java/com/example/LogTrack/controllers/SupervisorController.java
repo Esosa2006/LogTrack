@@ -1,10 +1,12 @@
 package com.example.LogTrack.controllers;
 
 import com.example.LogTrack.models.dtos.EvaluationDto;
+import com.example.LogTrack.models.dtos.SupervisorAssignedStudentDto;
 import com.example.LogTrack.models.dtos.logEntries.SupervisorLogEntryView;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.services.SupervisorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -45,4 +47,12 @@ public class SupervisorController {
         String email = authentication.getName();
         return supervisorService.viewStudentWeeklySummary(email, matricNo, weekNo);
     }
+
+    @GetMapping("/students")
+    public ResponseEntity<List<SupervisorAssignedStudentDto>> viewAssignedStudents(Authentication authentication){
+        String email = authentication.getName();
+        return supervisorService.viewAssignedStudents(email);
+    }
+
+
 }
