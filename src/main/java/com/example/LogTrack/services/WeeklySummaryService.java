@@ -33,50 +33,34 @@ public class WeeklySummaryService {
     public Student addEntryToWeeklySummary(LogEntry logEntry, int weekNumber, Student student) {
         List<WeeklySummary> summaries = student.getWeeklySummaries();
 
-        if (!hasIncompleteWeeklySummary(summaries)) {
-            WeeklySummary newSummary = new WeeklySummary();
-            newSummary.setStudent(student);
-            newSummary.setWeekNumber(weekNumber);
-            newSummary.getEntries().add(logEntry);
-            logEntry.setWeeklySummary(newSummary);
-            summaries.add(newSummary);
+        WeeklySummary targetSummary = getTargetSummary(summaries, weekNumber);
+
+        if (targetSummary == null) {
+            targetSummary = new WeeklySummary();
+            targetSummary.setStudent(student);
+            targetSummary.setWeekNumber(weekNumber);
+            summaries.add(targetSummary);
         }
 
-        else{
-            WeeklySummary targetSummary = getWeeklySummaryNotUpToFive(summaries);
-            if (targetSummary != null) {
-                targetSummary.getEntries().add(logEntry);
-                logEntry.setWeeklySummary(targetSummary);
-            } else {
-                WeeklySummary newSummary = new WeeklySummary();
-                newSummary.setStudent(student);
-                newSummary.setWeekNumber(summaries.size() + 1);
-                newSummary.getEntries().add(logEntry);
-                logEntry.setWeeklySummary(newSummary);
-                summaries.add(newSummary);
-            }
+        if (targetSummary.getEntries().size() == 6) {
+            throw new IllegalStateException("This week's summary already has 6 entries.");
         }
+
+        targetSummary.getEntries().add(logEntry);
+        logEntry.setWeeklySummary(targetSummary);
+
         return studentRepository.save(student);
     }
 
-
-    private WeeklySummary getWeeklySummaryNotUpToFive(List<WeeklySummary> weeklySummaries){
-        for (WeeklySummary summary : weeklySummaries){
-            if (summary.getEntries().size() < 7){
+    private WeeklySummary getTargetSummary(List<WeeklySummary> summaries, int weekNumber) {
+        for (WeeklySummary summary : summaries) {
+            if (summary.getWeekNumber() == weekNumber) {
                 return summary;
             }
         }
         return null;
     }
 
-    private boolean hasIncompleteWeeklySummary(List<WeeklySummary> weeklySummaries){
-        for (WeeklySummary summary : weeklySummaries){
-            if (summary.getEntries().size() < 6){
-                return true;
-            }
-        }
-        return false;
-    }
 
     public ResponseEntity<WeeklySummaryViewDto> getWeeklySummary(String email, int weekNumber) {
         Student student = studentRepository.findByEmail(email);
