@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SupervisorService {
     ResponseEntity<List<SupervisorLogEntryView>> viewStudentLogEntries(String email, String matricNo);
@@ -17,4 +18,6 @@ public interface SupervisorService {
     ResponseEntity<WeeklySummaryViewDto> viewStudentWeeklySummary(String email, String matricNo, int weekNo);
 
     ResponseEntity<List<SupervisorAssignedStudentDto>> viewAssignedStudents(String email);
+
+    ResponseEntity<String> updateProfile(String email, Map<String, Object> updates);
 }

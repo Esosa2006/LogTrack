@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class SupervisorServiceImpl implements SupervisorService {
@@ -143,5 +144,21 @@ public class SupervisorServiceImpl implements SupervisorService {
             supervisorAssignedStudentDtoList.add(studentToSupervisorViewMapper.toSupervisorAssignedStudentDto(student));
         }
         return ResponseEntity.status(HttpStatus.OK).body(supervisorAssignedStudentDtoList);
+    }
+
+    @Override
+    public ResponseEntity<String> updateProfile(String email, Map<String, Object> updates) {
+        Supervisor supervisor = supervisorRepository.findByEmail(email);
+        if (supervisor == null) {
+            throw new SupervisorNotFoundException("Supervisor not found");
+        }
+        if (updates.containsKey("name")){
+            supervisor.setName((String) updates.get("name"));
+        }
+        if (updates.containsKey("email")){
+            supervisor.setEmail((String) updates.get("email"));
+        }
+        supervisorRepository.save(supervisor);
+        return ResponseEntity.ok("Successfully updated");
     }
 }

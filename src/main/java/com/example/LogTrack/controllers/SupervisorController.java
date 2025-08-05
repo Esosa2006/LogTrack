@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/supervisor")
@@ -52,6 +53,13 @@ public class SupervisorController {
     public ResponseEntity<List<SupervisorAssignedStudentDto>> viewAssignedStudents(Authentication authentication){
         String email = authentication.getName();
         return supervisorService.viewAssignedStudents(email);
+    }
+
+    @PatchMapping("/profile/update")
+    public ResponseEntity<String> updateProfile(Authentication authentication,
+                                                @RequestBody Map<String,Object> updates){
+        String email = authentication.getName();
+        return supervisorService.updateProfile(email, updates);
     }
 
 
