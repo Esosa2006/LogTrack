@@ -42,7 +42,7 @@ public class WeeklySummaryService {
             summaries.add(targetSummary);
         }
 
-        if (targetSummary.getEntries().size() == 6) {
+        if (targetSummary.getEntries().size() >= 6) {
             throw new IllegalStateException("This week's summary already has 6 entries.");
         }
 

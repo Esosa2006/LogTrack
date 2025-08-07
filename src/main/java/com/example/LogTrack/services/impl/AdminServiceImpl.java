@@ -3,6 +3,7 @@ package com.example.LogTrack.services.impl;
 import com.example.LogTrack.exceptions.exceptions.*;
 import com.example.LogTrack.mapper.ToStudentViewDtoMapper;
 import com.example.LogTrack.mapper.ToSupervisorDtoMapper;
+import com.example.LogTrack.models.dtos.ApiInfoDto;
 import com.example.LogTrack.models.dtos.AssignmentDto;
 import com.example.LogTrack.models.dtos.adminViews.StudentViewDto;
 import com.example.LogTrack.models.dtos.adminViews.SupervisorDto;
@@ -121,6 +122,15 @@ public class AdminServiceImpl implements AdminService {
             throw new FieldNotFoundException("No such field found!");
         }
     }
+
+//    @Override
+//    public ResponseEntity<ApiInfoDto> viewSystemInfo() {
+//        ApiInfoDto apiInfoDto = new ApiInfoDto();
+//        int no_of_students = studentRepository.findAll().size();
+//        int no_of_supervisors = supervisorRepository.findAll().size();
+//        apiInfoDto.setNo_of_active_accounts(no_of_students +  no_of_supervisors);
+//
+//    }
 
     private static void emptyListCheck(List<StudentViewDto> list) {
         if (list.isEmpty()){

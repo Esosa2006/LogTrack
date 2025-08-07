@@ -1,5 +1,6 @@
 package com.example.LogTrack.controllers;
 
+import com.example.LogTrack.models.dtos.ApiInfoDto;
 import com.example.LogTrack.models.dtos.EvaluationDto;
 import com.example.LogTrack.models.dtos.SupervisorAssignedStudentDto;
 import com.example.LogTrack.models.dtos.logEntries.SupervisorLogEntryView;
@@ -57,10 +58,8 @@ public class SupervisorController {
 
     @PatchMapping("/profile/update")
     public ResponseEntity<String> updateProfile(Authentication authentication,
-                                                @RequestBody Map<String,Object> updates){
+                                                @RequestBody Map<String,Object> updates) {
         String email = authentication.getName();
         return supervisorService.updateProfile(email, updates);
     }
-
-
 }
