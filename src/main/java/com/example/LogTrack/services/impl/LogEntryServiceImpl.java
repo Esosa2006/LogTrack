@@ -51,7 +51,7 @@ public class LogEntryServiceImpl implements LogEntryService {
         logEntry.setDate(LocalDate.now());
         logEntry.setStatus(EntryStatus.PENDING);
         logEntry.setActivityDescription(logEntryCreationDto.getActivityDescription());
-        weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student);
+        weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student, logEntryCreationDto.getDayNo());
         log.info("Log Entry created successfully");
         return ResponseEntity.status(HttpStatus.CREATED).body("Entry successfully created");
     }

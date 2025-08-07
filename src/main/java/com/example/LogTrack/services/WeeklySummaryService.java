@@ -1,5 +1,7 @@
 package com.example.LogTrack.services;
 
+import com.example.LogTrack.exceptions.exceptions.AlreadyExistingEntryFoundException;
+import com.example.LogTrack.exceptions.exceptions.FullSummaryException;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.LogEntry;
@@ -30,7 +32,7 @@ public class WeeklySummaryService {
         this.summaryDisplayMapper = summaryDisplayMapper;
     }
 
-    public Student addEntryToWeeklySummary(LogEntry logEntry, int weekNumber, Student student) {
+    public Student addEntryToWeeklySummary(LogEntry logEntry, int weekNumber, Student student, int dayNo) {
         List<WeeklySummary> summaries = student.getWeeklySummaries();
 
         WeeklySummary targetSummary = getTargetSummary(summaries, weekNumber);
@@ -43,10 +45,14 @@ public class WeeklySummaryService {
         }
 
         if (targetSummary.getEntries().size() >= 6) {
-            throw new IllegalStateException("This week's summary already has 6 entries.");
+            throw new FullSummaryException("This week's summary already has 6 entries.");
         }
 
-        targetSummary.getEntries().add(logEntry);
+        if (targetSummary.getEntries().get(dayNo - 1) != null) {
+            throw new AlreadyExistingEntryFoundException("Entry already exists in this field");
+        }
+
+        targetSummary.getEntries().add(dayNo - 1, logEntry);
         logEntry.setWeeklySummary(targetSummary);
 
         return studentRepository.save(student);
