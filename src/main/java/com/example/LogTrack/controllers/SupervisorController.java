@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/supervisor")
@@ -53,6 +52,4 @@ public class SupervisorController {
         String email = authentication.getName();
         return supervisorService.viewAssignedStudents(email);
     }
-
-
 }
