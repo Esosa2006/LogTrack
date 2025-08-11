@@ -39,6 +39,8 @@ public class SecurityConfig {
                         .requestMatchers("/student/**").hasRole("STUDENT")
                         .requestMatchers("/supervisor/**").hasRole("SUPERVISOR")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/profile/student/**").hasRole("STUDENT")
+                        .requestMatchers("/profile/supervisor/**").hasRole("SUPERVISOR")
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .httpBasic(Customizer.withDefaults())
