@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,4 +25,6 @@ public class AppUser {
     private String password;
     @Column(name = "role")
     private Role role;
+    @Column(name = "createdAt")
+    private Date createdAt;
 }

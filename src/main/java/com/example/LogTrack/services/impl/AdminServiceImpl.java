@@ -135,15 +135,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
-//    @Override
-//    public ResponseEntity<ApiInfoDto> viewSystemInfo() {
-//        ApiInfoDto apiInfoDto = new ApiInfoDto();
-//        int no_of_students = studentRepository.findAll().size();
-//        int no_of_supervisors = supervisorRepository.findAll().size();
-//        apiInfoDto.setNo_of_active_accounts(no_of_students +  no_of_supervisors);
-//
-//    }
-
     private static void emptyListCheck(List<StudentViewDto> list) {
         if (list.isEmpty()){
             throw new EmptyRepoException("No students found!");

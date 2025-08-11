@@ -24,6 +24,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -95,6 +97,7 @@ public class AuthServiceImpl implements AuthService {
         newStudent.setPassword(encoder.encode(studentSignUpRequest.getPassword()));
         newStudent.setName(studentSignUpRequest.getName());
         newStudent.setRole(Role.STUDENT);
+        newStudent.setCreatedAt(new Date());
         return newStudent;
     }
 
@@ -105,6 +108,7 @@ public class AuthServiceImpl implements AuthService {
         newSupervisor.setPassword(encoder.encode(supervisorSignUpRequest.getPassword()));
         newSupervisor.setName(supervisorSignUpRequest.getName());
         newSupervisor.setRole(Role.SUPERVISOR);
+        newSupervisor.setCreatedAt(new Date());
         return newSupervisor;
     }
 }
