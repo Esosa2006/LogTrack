@@ -47,10 +47,10 @@ public class AdminController {
         return adminService.searchForSupervisorByField(search);
     }
 
-//    @GetMapping("/viewSystemDashboard")
-//    public ResponseEntity<ApiInfoDto> viewSystemInfo(){
-//        return adminService.viewSystemInfo();
-//    }
+    @GetMapping("/viewSystemDashboard")
+    public ResponseEntity<String> getActiveUserCount(){
+        return adminService.getActiveUserCount();
+    }
 
 
 

@@ -1,6 +1,5 @@
 package com.example.LogTrack.services;
 
-import com.example.LogTrack.models.dtos.ApiInfoDto;
 import com.example.LogTrack.models.dtos.AssignmentDto;
 import com.example.LogTrack.models.dtos.adminViews.StudentViewDto;
 import com.example.LogTrack.models.dtos.adminViews.SupervisorDto;
@@ -20,5 +19,5 @@ public interface AdminService {
 
     List<SupervisorDto> searchForSupervisorByField(Map<String, Object> search);
 
-//    ResponseEntity<ApiInfoDto> viewSystemInfo();
+    ResponseEntity<String> getActiveUserCount();
 }

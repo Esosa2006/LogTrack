@@ -3,7 +3,6 @@ package com.example.LogTrack.services.impl;
 import com.example.LogTrack.exceptions.exceptions.*;
 import com.example.LogTrack.mapper.ToStudentViewDtoMapper;
 import com.example.LogTrack.mapper.ToSupervisorDtoMapper;
-import com.example.LogTrack.models.dtos.ApiInfoDto;
 import com.example.LogTrack.models.dtos.AssignmentDto;
 import com.example.LogTrack.models.dtos.adminViews.StudentViewDto;
 import com.example.LogTrack.models.dtos.adminViews.SupervisorDto;
@@ -12,6 +11,7 @@ import com.example.LogTrack.models.entities.Supervisor;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.SupervisorRepository;
 import com.example.LogTrack.services.AdminService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class AdminServiceImpl implements AdminService {
     private final StudentRepository studentRepository;
@@ -122,6 +123,17 @@ public class AdminServiceImpl implements AdminService {
             throw new FieldNotFoundException("No such field found!");
         }
     }
+
+    @Override
+    public ResponseEntity<String> getActiveUserCount() {
+        int studentCount = studentRepository.findAll().size();
+        log.info("Number of student accounts: {}",  studentCount);
+        int supervisorCount = supervisorRepository.findAll().size();
+        log.info("Number of supervisor accounts: {}",  supervisorCount);
+        String sentence = "Total number of accounts: " + studentCount + supervisorCount;
+        return ResponseEntity.status(HttpStatus.OK).body(sentence);
+    }
+
 
 //    @Override
 //    public ResponseEntity<ApiInfoDto> viewSystemInfo() {
