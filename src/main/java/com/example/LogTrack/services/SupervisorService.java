@@ -18,6 +18,4 @@ public interface SupervisorService {
     ResponseEntity<WeeklySummaryViewDto> viewStudentWeeklySummary(String email, String matricNo, int weekNo);
 
     ResponseEntity<List<SupervisorAssignedStudentDto>> viewAssignedStudents(String email);
-
-    ResponseEntity<String> updateProfile(String email, Map<String, Object> updates);
 }

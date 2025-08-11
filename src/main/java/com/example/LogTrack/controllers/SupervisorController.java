@@ -54,10 +54,5 @@ public class SupervisorController {
         return supervisorService.viewAssignedStudents(email);
     }
 
-    @PatchMapping("/profile/update")
-    public ResponseEntity<String> updateProfile(Authentication authentication,
-                                                @RequestBody Map<String,Object> updates) {
-        String email = authentication.getName();
-        return supervisorService.updateProfile(email, updates);
-    }
+
 }

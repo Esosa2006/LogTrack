@@ -172,24 +172,4 @@ public class SupervisorServiceImpl implements SupervisorService {
         log.info("Assigned students list retrieved successfully");
         return ResponseEntity.status(HttpStatus.OK).body(supervisorAssignedStudentDtoList);
     }
-
-    @Override
-    public ResponseEntity<String> updateProfile(String email, Map<String, Object> updates) {
-        Supervisor supervisor = supervisorRepository.findByEmail(email);
-        if (supervisor == null) {
-            log.error("Supervisor with email {} not found in supervisor Repository", email);
-            throw new SupervisorNotFoundException("Supervisor not found");
-        }
-        if (updates.containsKey("name")){
-            supervisor.setName((String) updates.get("name"));
-            log.info("Name updated successfully to {}",  updates.get("name"));
-        }
-        if (updates.containsKey("email")){
-            supervisor.setEmail((String) updates.get("email"));
-            log.info("Email updated successfully to {}",  updates.get("email"));
-        }
-        supervisorRepository.save(supervisor);
-        log.info("User profile updated successfully");
-        return ResponseEntity.ok("Successfully updated");
-    }
 }
