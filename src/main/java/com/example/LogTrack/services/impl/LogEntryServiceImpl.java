@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -64,24 +65,36 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.error("WeeklySummary not found in summary Repo");
             throw new WeeklySummaryNotFoundException("No week with this week number was found!");
         }
+
         if (dayNo < 1 || dayNo > 7) {
             log.error("Day number out of range");
             throw new InvalidDayNumberException("Invalid day number! Pick between days 1-6");
         }
-        if(weeklySummary.getEntries().size() < dayNo){
-            log.error("Day does not exist in summary");
+
+        LogEntry matchingEntry = null;
+        for (LogEntry entry : weeklySummary.getEntries()) {
+            if (entry != null && Objects.equals(entry.getDayNo(), dayNo)) {
+                matchingEntry = entry;
+                break;
+            }
+        }
+
+        if (matchingEntry == null) {
+            log.error("No log entry found for day {}", dayNo);
             throw new NoLogEntryFoundException("No log entry was found!");
         }
-        LogEntry logEntry = weeklySummary.getEntries().get(dayNo - 1);
+
         DailyLogEntryDto dailyLogEntryDto = new DailyLogEntryDto();
-        dailyLogEntryDto.setDate(logEntry.getDate());
-        dailyLogEntryDto.setActivityDescription(logEntry.getActivityDescription());
-        dailyLogEntryDto.setComment(logEntry.getComment());
-        dailyLogEntryDto.setStatus(logEntry.getStatus());
-        dailyLogEntryDto.setId(logEntry.getId());
+        dailyLogEntryDto.setDate(matchingEntry.getDate());
+        dailyLogEntryDto.setActivityDescription(matchingEntry.getActivityDescription());
+        dailyLogEntryDto.setComment(matchingEntry.getComment());
+        dailyLogEntryDto.setStatus(matchingEntry.getStatus());
+        dailyLogEntryDto.setId(matchingEntry.getId());
+
         log.info("Log Entry retrieved successfully");
         return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDto);
     }
+
 
     @Override
     public ResponseEntity<String> updateLogEntry(String email, Long id, Map<String, Object> updates) {
@@ -95,18 +108,18 @@ public class LogEntryServiceImpl implements LogEntryService {
             if (updates.containsKey("activityDescription")) {
                 logEntry.setActivityDescription((String) updates.get("activityDescription"));
                 logEntryRepository.save(logEntry);
-                studentRepository.save(weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntry.getWeeklySummary().getWeekNumber(), student));
+                studentRepository.save(weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntry.getWeeklySummary().getWeekNumber(), student, logEntry.getWeeklySummary().getEntries().indexOf(logEntry) + 1));
                 log.info("Log Entry updated successfully");
                 return ResponseEntity.status(HttpStatus.OK).body("Entry successfully updated");
             }
             else{
                 log.error("Failed to update log entry.");
-                throw new FieldRestrictionException("You cannot edit this field!");
+                throw new GlobalException("You cannot edit this field!");
             }
         }
         else{
             log.error("Log entry with id {} has already been approved by supervisor", id);
-            throw new EntryAlreadyApprovedException("You cant edit an already approved Entry!");
+            throw new GlobalException("You cant edit an already approved Entry!");
         }
     }
 

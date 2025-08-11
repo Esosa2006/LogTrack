@@ -15,6 +15,8 @@ public class LogEntry {
     private Long id;
     @Column(name = "date")
     private LocalDate date;
+    @Column(name = "day")
+    private Integer dayNo;
     @Column(name = "status")
     private EntryStatus status;
     @Column(name = "activityDescrption")

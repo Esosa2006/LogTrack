@@ -1,7 +1,6 @@
 package com.example.LogTrack.exceptions;
 
 import com.example.LogTrack.exceptions.exceptions.*;
-import com.example.LogTrack.models.entities.Student;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,17 +20,8 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(z, HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(value = FullSummaryException.class)
-    public ResponseEntity<Object> handleFullSummaryException(FullSummaryException e) {
-        Exception z = new Exception(
-                e.getMessage(),
-                HttpStatus.BAD_REQUEST,
-                ZonedDateTime.now(ZoneId.of("Z"))
-        );
-        return new ResponseEntity<>(z, HttpStatus.BAD_REQUEST);
-    }
-    @ExceptionHandler(value = AlreadyExistingEntryFoundException.class)
-    public ResponseEntity<Object> handleAlreadyExistingEntryFoundException(AlreadyExistingEntryFoundException e) {
+    @ExceptionHandler(value = GlobalException.class)
+    public ResponseEntity<Object> handleGlobalException(GlobalException e) {
         Exception z = new Exception(
                 e.getMessage(),
                 HttpStatus.BAD_REQUEST,
@@ -68,24 +58,6 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(value = EmailAlreadyInUseException.class)
     public ResponseEntity<Object> handleEmailAlreadyInUseException(EmailAlreadyInUseException e) {
-        Exception z = new Exception(
-                e.getMessage(),
-                HttpStatus.BAD_REQUEST,
-                ZonedDateTime.now(ZoneId.of("Z"))
-        );
-        return new ResponseEntity<>(z, HttpStatus.BAD_REQUEST);
-    }
-    @ExceptionHandler(value = EntryAlreadyApprovedException.class)
-    public ResponseEntity<Object> handleEntryAlreadyApprovedException(EntryAlreadyApprovedException e) {
-        Exception z = new Exception(
-                e.getMessage(),
-                HttpStatus.BAD_REQUEST,
-                ZonedDateTime.now(ZoneId.of("Z"))
-        );
-        return new ResponseEntity<>(z, HttpStatus.BAD_REQUEST);
-    }
-    @ExceptionHandler(value = FieldRestrictionException.class)
-    public ResponseEntity<Object> handleFieldRestrictionException(FieldRestrictionException e) {
         Exception z = new Exception(
                 e.getMessage(),
                 HttpStatus.BAD_REQUEST,

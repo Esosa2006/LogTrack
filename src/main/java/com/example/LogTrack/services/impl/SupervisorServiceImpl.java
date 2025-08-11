@@ -1,9 +1,7 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.EntryStatus;
-import com.example.LogTrack.exceptions.exceptions.StudentNotFoundException;
-import com.example.LogTrack.exceptions.exceptions.SupervisorNotFoundException;
-import com.example.LogTrack.exceptions.exceptions.WeeklySummaryNotFoundException;
+import com.example.LogTrack.exceptions.exceptions.*;
 import com.example.LogTrack.mapper.LogEntryForSupervisorMapper;
 import com.example.LogTrack.mapper.StudentToSupervisorViewMapper;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
@@ -57,12 +55,12 @@ public class SupervisorServiceImpl implements SupervisorService {
         Supervisor supervisor = supervisorRepository.findByEmail(email);
         if (supervisor == null) {
             log.error("Supervisor with email {} not found in supervisor repo", email);
-            throw new RuntimeException("Supervisor not found");
+            throw new SupervisorNotFoundException("Supervisor not found");
         }
         Student student = studentRepository.findByMatricNumber(matricNo);
         if (student == null) {
             log.error("Student with email {} not found in student repo", email);
-            throw new RuntimeException("Student with MatricNumber " + matricNo + " not found");
+            throw new MatricNumberNotFoundException("Student with MatricNumber " + matricNo + " not found");
         }
 
         if (supervisor.getStudents().contains(student)) {
@@ -76,7 +74,7 @@ public class SupervisorServiceImpl implements SupervisorService {
             return ResponseEntity.ok(logEntryViewList);
         }
         log.info("Student with email {} not found in supervisor's list of assigned students", email);
-        throw new RuntimeException("This student is not assigned to you!");
+        throw new StudentNotUnderSupervisorException("This student is not assigned to you!");
     }
 
     @Override
@@ -84,28 +82,34 @@ public class SupervisorServiceImpl implements SupervisorService {
         Supervisor supervisor = supervisorRepository.findByEmail(email);
         if (supervisor == null) {
             log.error("Supervisor with email ({}) not found in supervisor repository", email);
-            throw new RuntimeException("Supervisor not found");
+            throw new SupervisorNotFoundException("Supervisor not found");
         }
         Student student = studentRepository.findByMatricNumber(matricNo);
         if (student == null) {
             log.error("Student with matric Number ({}) not found in student Repository", matricNo);
-            throw new RuntimeException("Student with MatricNumber " + matricNo + " not found");
+            throw new MatricNumberNotFoundException("Student with MatricNumber " + matricNo + " not found");
         }
         if (supervisor.getStudents().contains(student)) {
             WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNo, student);
             if (weeklySummary == null) {
                 log.error("Weekly summary not found!");
-                throw new RuntimeException("Weekly summary not found");
+                throw new WeeklySummaryNotFoundException("Weekly summary not found");
             }
             List<LogEntry> entries = weeklySummary.getEntries();
-            if (entries == null || entries.isEmpty() || dayNo < 1 || dayNo > entries.size()) {
+            if (entries == null || entries.isEmpty() || dayNo < 1 || dayNo > 6) {
                 log.error("Day number out of range or entries list is empty");
-                throw new RuntimeException("Invalid day number: " + dayNo);
+                throw new InvalidDayNumberException("Invalid day number: " + dayNo);
             }
-            LogEntry logEntry = entries.get(dayNo - 1);
+            LogEntry logEntry = null;
+            for(LogEntry entry : entries){
+                if (entry.getDayNo() == dayNo){
+                    logEntry = entry;
+                    break;
+                }
+            }
             if (logEntry == null) {
                 log.error("Log entry for day {} not found", dayNo);
-                throw new RuntimeException("Log entry for day " + dayNo + " not found");
+                throw new NoLogEntryFoundException("Log entry for day " + dayNo + " not found");
             }
             if (dto.getStatus().equalsIgnoreCase("Approved")){
                 logEntry.setStatus(EntryStatus.APPROVED);
@@ -125,7 +129,7 @@ public class SupervisorServiceImpl implements SupervisorService {
         }
         else{
             log.error("Student with matric number {} not found in assigned students list", matricNo);
-            throw new RuntimeException("This student is not assigned to you!");
+            throw new StudentNotUnderSupervisorException("This student is not assigned to you!");
         }
     }
 
@@ -135,11 +139,11 @@ public class SupervisorServiceImpl implements SupervisorService {
         Supervisor supervisor = supervisorRepository.findByEmail(email);
         if (student == null) {
             log.error("Student with matric number {} not found in student Repo", matricNo);
-            throw new RuntimeException("Student with MatricNumber " + matricNo + " not found");
+            throw new MatricNumberNotFoundException("Student with MatricNumber " + matricNo + " not found");
         }
         if (!supervisor.getStudents().contains(student)) {
             log.error("Student with matricNumber {} not found in supervisor's list of assigned students", matricNo);
-            throw new RuntimeException("This student is not assigned to you!");
+            throw new StudentNotUnderSupervisorException("This student is not assigned to you!");
         }
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNo, student);
         if (weeklySummary == null) {

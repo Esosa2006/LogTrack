@@ -1,13 +1,12 @@
 package com.example.LogTrack.services;
 
-import com.example.LogTrack.exceptions.exceptions.AlreadyExistingEntryFoundException;
-import com.example.LogTrack.exceptions.exceptions.FullSummaryException;
+import com.example.LogTrack.exceptions.exceptions.GlobalException;
+import com.example.LogTrack.exceptions.exceptions.InvalidDayNumberException;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
 import com.example.LogTrack.models.dtos.weeklySummaries.WeeklySummaryViewDto;
 import com.example.LogTrack.models.entities.LogEntry;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.WeeklySummary;
-import com.example.LogTrack.repositories.LogEntryRepository;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.WeeklySummaryRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -41,20 +42,32 @@ public class WeeklySummaryService {
             targetSummary = new WeeklySummary();
             targetSummary.setStudent(student);
             targetSummary.setWeekNumber(weekNumber);
+            targetSummary.setEntries(new ArrayList<>());
             summaries.add(targetSummary);
         }
 
+        if (targetSummary.getEntries() == null) {
+            targetSummary.setEntries(new ArrayList<>());
+        }
+
+        if (dayNo < 1 || dayNo > 6) {
+            log.error("Day number out of range");
+            throw new InvalidDayNumberException("Invalid day number! Pick between days 1-6");
+        }
+
         if (targetSummary.getEntries().size() >= 6) {
-            throw new FullSummaryException("This week's summary already has 6 entries.");
+            throw new GlobalException("This week's summary already has 6 entries.");
         }
 
-        if (targetSummary.getEntries().get(dayNo - 1) != null) {
-            throw new AlreadyExistingEntryFoundException("Entry already exists in this field");
+        boolean existsForDay = targetSummary.getEntries().stream()
+                .anyMatch(e -> e != null && Objects.equals(e.getDayNo(), dayNo));
+        if (existsForDay) {
+            throw new GlobalException("Entry already exists in this field");
         }
 
-        targetSummary.getEntries().add(dayNo - 1, logEntry);
+        logEntry.setDayNo(dayNo);
+        targetSummary.getEntries().add(logEntry);
         logEntry.setWeeklySummary(targetSummary);
-
         return studentRepository.save(student);
     }
 
@@ -72,6 +85,7 @@ public class WeeklySummaryService {
         Student student = studentRepository.findByEmail(email);
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNumber, student);
         WeeklySummaryViewDto weeklySummaryViewDto = summaryDisplayMapper.toWeeklySummary(generateWeeklySummaryText(weeklySummary));
+        studentRepository.save(student);
         return ResponseEntity.status(HttpStatus.OK).body(weeklySummaryViewDto);
     }
 
