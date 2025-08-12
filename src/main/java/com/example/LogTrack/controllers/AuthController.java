@@ -1,6 +1,7 @@
 package com.example.LogTrack.controllers;
 
 import com.example.LogTrack.models.dtos.authDtos.LoginDto;
+import com.example.LogTrack.models.dtos.authDtos.ResetPasswordDto;
 import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
 import com.example.LogTrack.services.AuthService;
@@ -38,6 +39,17 @@ public class AuthController {
     @PostMapping("/verifyToken")
     public ResponseEntity<String> verifyToken(@RequestParam String token){
         return authService.verifyAccount(token);
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<String> resetPassword(@RequestParam String email){
+        return authService.resetPassword(email);
+    }
+
+    @PostMapping("/verifyResetPasswordToken")
+    public ResponseEntity<String> verifyResetPasswordToken(@RequestParam String token,
+                                                           @RequestBody ResetPasswordDto resetPasswordDto){
+        return authService.verifyResetPasswordToken(token, resetPasswordDto);
     }
 }
 

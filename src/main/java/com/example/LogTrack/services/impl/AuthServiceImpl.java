@@ -3,10 +3,13 @@ package com.example.LogTrack.services.impl;
 import com.example.LogTrack.enums.Role;
 import com.example.LogTrack.exceptions.exceptions.AuthenticationFailedException;
 import com.example.LogTrack.exceptions.exceptions.EmailAlreadyInUseException;
+import com.example.LogTrack.exceptions.exceptions.GlobalException;
 import com.example.LogTrack.exceptions.exceptions.PasswordMissmatchException;
 import com.example.LogTrack.models.dtos.authDtos.LoginDto;
+import com.example.LogTrack.models.dtos.authDtos.ResetPasswordDto;
 import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
+import com.example.LogTrack.models.entities.AppUser;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.Supervisor;
 import com.example.LogTrack.repositories.StudentRepository;
@@ -125,6 +128,58 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid verification link.");
     }
 
+    @Override
+    public ResponseEntity<String> resetPassword(String email) {
+        if(email == null) {
+            throw new GlobalException("No email was entered!");
+        }
+        String resetPasswordToken = UUID.randomUUID().toString();
+        Student student = studentRepository.findByEmail(email);
+        if (student != null) {
+            student.setResetPasswordToken(resetPasswordToken);
+            studentRepository.save(student);
+            resetPasswordMessage(student);
+            return ResponseEntity.status(HttpStatus.OK).body("Reset Password Email Sent!");
+        }
+        Supervisor supervisor = supervisorRepository.findByEmail(email);
+        if (supervisor != null) {
+            supervisor.setResetPasswordToken(resetPasswordToken);
+            supervisorRepository.save(supervisor);
+            resetPasswordMessage(supervisor);
+            return ResponseEntity.status(HttpStatus.OK).body("Reset Password Email Sent!");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid email!");
+    }
+
+    @Override
+    public ResponseEntity<String> verifyResetPasswordToken(String token, ResetPasswordDto resetPasswordDto) {
+        Student student = studentRepository.findByResetPasswordToken(token);
+        if (student != null){
+            if (resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmNewPassword())) {
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                student.setPassword(encoder.encode(resetPasswordDto.getNewPassword()));
+                studentRepository.save(student);
+                return ResponseEntity.status(HttpStatus.OK).body("Password Successfully Reset!");
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match!");
+            }
+        }
+        Supervisor supervisor = supervisorRepository.findByResetPasswordToken(token);
+        if (supervisor != null){
+            if (resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmNewPassword())) {
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                supervisor.setPassword(encoder.encode(resetPasswordDto.getNewPassword()));
+                supervisorRepository.save(supervisor);
+                return ResponseEntity.status(HttpStatus.OK).body("Password Successfully Reset!");
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match!");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token!");
+    }
+
 
     private static Student createStudent(StudentSignUpRequest studentSignUpRequest) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -158,23 +213,31 @@ public class AuthServiceImpl implements AuthService {
     private void supervisorWelcomeMessage(Supervisor supervisor) {
         emailService.sendEmail(supervisor.getEmail(),
                 "Welcome to LogTrack!",
-                "Your account has been successfully created.\n" +
-                        "\n" +
-                        "You can now monitor and evaluate your students daily/weekly log entries and track their internship progress." +
-                        "If you did not sign up for this account, please contact the system administrator immediately.\n" +
-                        "\n" +
-                        "Best regards,  \n" +
-                        "The Logtrack Team");
+                """
+                        Your account has been successfully created.
+                        
+                        You can now monitor and evaluate your students daily/weekly log entries and track their internship progress.\
+                        If you did not sign up for this account, please contact the system administrator immediately.
+                        
+                        Best regards, \s
+                        The Log-track Team""");
     }
     private void studentWelcomeMessage(Student student) {
         emailService.sendEmail(student.getEmail(),
                 "Welcome to LogTrack!",
-                "Your account has been successfully created.\n" +
-                        "\n" +
-                        "You can now log in to submit your daily/weekly log entries and track your internship progress." +
-                        "If you did not sign up for this account, please contact the system administrator immediately.\n" +
-                        "\n" +
-                        "Best regards,  \n" +
-                        "The Logtrack Team");
+                """
+                        Your account has been successfully created.
+                        
+                        You can now log in to submit your daily/weekly log entries and track your internship progress.\
+                        If you did not sign up for this account, please contact the system administrator immediately.
+                        
+                        Best regards, \s
+                        The Log-track Team""");
+    }
+
+    private void resetPasswordMessage(AppUser appUser) {
+        emailService.sendEmail(appUser.getEmail(),
+                "Reset Your Password",
+                "Reset Token : " + appUser.getResetPasswordToken());
     }
 }

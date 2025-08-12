@@ -31,4 +31,6 @@ public class AppUser {
     private boolean enabled = false;
     @Column(name = "verificationToken")
     private String verificationToken;
+    @Column(name = "resetPasswordToken")
+    private String resetPasswordToken;
 }

@@ -1,6 +1,7 @@
 package com.example.LogTrack.services;
 
 import com.example.LogTrack.models.dtos.authDtos.LoginDto;
+import com.example.LogTrack.models.dtos.authDtos.ResetPasswordDto;
 import com.example.LogTrack.models.dtos.authDtos.StudentSignUpRequest;
 import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
 import jakarta.validation.Valid;
@@ -14,4 +15,8 @@ public interface AuthService {
     ResponseEntity<String> login(@Valid LoginDto loginDto);
 
     ResponseEntity<String> verifyAccount(String token);
+
+    ResponseEntity<String> resetPassword(String email);
+
+    ResponseEntity<String> verifyResetPasswordToken(String token, ResetPasswordDto resetPasswordDto);
 }
