@@ -11,4 +11,6 @@ public interface SupervisorRepository extends JpaRepository<Supervisor,Integer> 
     Supervisor findByEmail(String email);
     List<Supervisor> findAllByName(String name);
     List<Supervisor> findAllByEmail(String email);
+
+    Supervisor findByVerificationToken(String token);
 }

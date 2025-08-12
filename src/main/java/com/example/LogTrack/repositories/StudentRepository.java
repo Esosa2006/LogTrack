@@ -15,4 +15,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findAllByMatricNumber(String matricNumber);
     List<Student> findAllBySupervisorName(String supervisorName);
     List<Student> findAllBySupervisorEmail(String supervisorEmail);
+
+    Student findByVerificationToken(String token);
 }

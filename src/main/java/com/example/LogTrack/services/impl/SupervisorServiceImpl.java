@@ -17,6 +17,7 @@ import com.example.LogTrack.repositories.LogEntryRepository;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.SupervisorRepository;
 import com.example.LogTrack.repositories.WeeklySummaryRepository;
+import com.example.LogTrack.services.EmailService;
 import com.example.LogTrack.services.SupervisorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,10 @@ public class SupervisorServiceImpl implements SupervisorService {
     private final LogEntryRepository logEntryRepository;
     private final SummaryDisplayMapper summaryDisplayMapper;
     private final StudentToSupervisorViewMapper studentToSupervisorViewMapper;
+    private final EmailService emailService;
 
     @Autowired
-    public SupervisorServiceImpl(SupervisorRepository supervisorRepository, StudentRepository studentRepository, LogEntryForSupervisorMapper logEntryForSupervisorMapper, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository, SummaryDisplayMapper summaryDisplayMapper, StudentToSupervisorViewMapper studentToSupervisorViewMapper) {
+    public SupervisorServiceImpl(SupervisorRepository supervisorRepository, StudentRepository studentRepository, LogEntryForSupervisorMapper logEntryForSupervisorMapper, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository, SummaryDisplayMapper summaryDisplayMapper, StudentToSupervisorViewMapper studentToSupervisorViewMapper, EmailService emailService) {
         this.supervisorRepository = supervisorRepository;
         this.studentRepository = studentRepository;
         this.logEntryForSupervisorMapper = logEntryForSupervisorMapper;
@@ -48,6 +50,7 @@ public class SupervisorServiceImpl implements SupervisorService {
         this.logEntryRepository = logEntryRepository;
         this.summaryDisplayMapper = summaryDisplayMapper;
         this.studentToSupervisorViewMapper = studentToSupervisorViewMapper;
+        this.emailService = emailService;
     }
 
     @Override
@@ -125,6 +128,9 @@ public class SupervisorServiceImpl implements SupervisorService {
             logEntry.setComment(dto.getComment());
             logEntryRepository.save(logEntry);
             log.info("Log Entry successfully updated!");
+            emailService.sendEmail(student.getEmail(),
+                    "Entry evaluated",
+                    "Your entry for day " + dayNo + " week " + weekNo + " has been evaluated by your line manager!");
             return ResponseEntity.ok("Successfully evaluated!");
         }
         else{

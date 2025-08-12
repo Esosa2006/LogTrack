@@ -11,6 +11,7 @@ import com.example.LogTrack.models.entities.WeeklySummary;
 import com.example.LogTrack.repositories.LogEntryRepository;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.WeeklySummaryRepository;
+import com.example.LogTrack.services.EmailService;
 import com.example.LogTrack.services.LogEntryService;
 import com.example.LogTrack.services.WeeklySummaryService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,13 +33,15 @@ public class LogEntryServiceImpl implements LogEntryService {
     private final WeeklySummaryService weeklySummaryService;
     private final WeeklySummaryRepository weeklySummaryRepository;
     private final LogEntryRepository logEntryRepository;
+    private final EmailService emailService;
 
     @Autowired
-    public LogEntryServiceImpl(StudentRepository studentRepository, WeeklySummaryService weeklySummaryService, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository) {
+    public LogEntryServiceImpl(StudentRepository studentRepository, WeeklySummaryService weeklySummaryService, WeeklySummaryRepository weeklySummaryRepository, LogEntryRepository logEntryRepository, EmailService emailService) {
         this.studentRepository = studentRepository;
         this.weeklySummaryService = weeklySummaryService;
         this.weeklySummaryRepository = weeklySummaryRepository;
         this.logEntryRepository = logEntryRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -48,18 +51,28 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.error("Student with email {} not found in student Repo", email);
             throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
+        ensureEnabled(student);
         LogEntry logEntry = new LogEntry();
         logEntry.setDate(LocalDate.now());
         logEntry.setStatus(EntryStatus.PENDING);
         logEntry.setActivityDescription(logEntryCreationDto.getActivityDescription());
         weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student, logEntryCreationDto.getDayNo());
         log.info("Log Entry created successfully");
+        emailService.sendEmail(student.getSupervisor().getEmail(),
+                "New Long Entry Submission",
+                "Student " + student.getName() + " has submitted new Log Entry"
+                );
         return ResponseEntity.status(HttpStatus.CREATED).body("Entry successfully created");
     }
 
     @Override
     public ResponseEntity<DailyLogEntryDto> viewLogEntry(int weekNumber, int dayNo, String email) {
         Student student = studentRepository.findByEmail(email);
+        if (student == null){
+            log.error("Student with email {} not found in student repository.", email);
+            throw new StudentNotFoundException("Student with email " + email + " not found!");
+        }
+        ensureEnabled(student);
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNumber, student);
         if (weeklySummary == null) {
             log.error("WeeklySummary not found in summary Repo");
@@ -103,6 +116,7 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.error("Student with email {} not found in student repository", email);
             throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
+        ensureEnabled(student);
         LogEntry logEntry = logEntryRepository.findById(id).orElseThrow(() -> new NoLogEntryFoundException("Log entry for " + student.getName() + " with id " + id + " not found!"));
         if (logEntry.getStatus().equals(EntryStatus.PENDING)) {
             if (updates.containsKey("activityDescription")) {
@@ -130,6 +144,7 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.error("Student with email {} not found in student repo", email);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found!");
         }
+        ensureEnabled(student);
 
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(logEntryQueryDto.getWeekNo(), student);
         if (weeklySummary == null) {
@@ -170,6 +185,7 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.info("Student with email ({}) not found in student repo", email);
             throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
+        ensureEnabled(student);
         EntryStatus entryStatus = EntryStatus.valueOf(status);
         List<LogEntry> logEntryList = logEntryRepository.findByStatusAndStudentId(entryStatus, student.getId());
         List<DailyLogEntryDto> dailyLogEntryDtoList = new ArrayList<>();
@@ -184,6 +200,11 @@ public class LogEntryServiceImpl implements LogEntryService {
         }
         log.info("Entries retrieved successfully");
         return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDtoList);
+    }
+    private void ensureEnabled(Student student) {
+        if (!student.isEnabled()) {
+            throw new GlobalException("Please verify your email before continuing.");
+        }
     }
 
 }

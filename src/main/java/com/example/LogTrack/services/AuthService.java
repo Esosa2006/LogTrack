@@ -12,4 +12,6 @@ public interface AuthService {
     ResponseEntity<String> supervisorSignUp(SupervisorSignUpRequest supervisorSignUpRequest);
 
     ResponseEntity<String> login(@Valid LoginDto loginDto);
+
+    ResponseEntity<String> verifyAccount(String token);
 }

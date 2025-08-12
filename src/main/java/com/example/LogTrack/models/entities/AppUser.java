@@ -27,4 +27,8 @@ public class AppUser {
     private Role role;
     @Column(name = "createdAt")
     private Date createdAt;
+    @Column(name = "enabled")
+    private boolean enabled = false;
+    @Column(name = "verificationToken")
+    private String verificationToken;
 }
