@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -63,13 +64,7 @@ public class AuthServiceImpl implements AuthService {
         Student newStudent = createStudent(signUpRequest);
         studentRepository.save(newStudent);
         log.info("New Student Created");
-        String verificationLink = "http://localhost:8080/verify?token=" + newStudent.getVerificationToken();
-        emailService.sendEmail(
-                newStudent.getEmail(),
-                "Verify Your Account",
-                "Hello " + newStudent.getName() + ",\n\nClick the link below to activate your account:\n"
-                        + verificationLink
-        );
+        verifyAccountTokenMessage(newStudent);
         return ResponseEntity.status(HttpStatus.CREATED).body("Student Registration successful!");
     }
 
@@ -87,26 +82,29 @@ public class AuthServiceImpl implements AuthService {
         Supervisor newSupervisor = createSupervisor(supervisorSignUpRequest);
         supervisorRepository.save(newSupervisor);
         log.info("New Supervisor Created");
-        String verificationLink = "http://localhost:8080/verify?token=" + newSupervisor.getVerificationToken();
-        emailService.sendEmail(
-                newSupervisor.getEmail(),
-                "Verify Your Account",
-                "Hello " + newSupervisor.getName() + ",\n\nClick the link below to activate your account:\n"
-                        + verificationLink
-        );
+        verifyAccountTokenMessage(newSupervisor);
         return ResponseEntity.status(HttpStatus.CREATED).body("Supervisor Registration successful!");
     }
 
     @Override
     public ResponseEntity<String> login(LoginDto loginDto) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
-        if (!authentication.isAuthenticated()) {
-            log.error("Invalid username or password!");
-            throw new AuthenticationFailedException("Authentication failed");
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
+            if (!authentication.isAuthenticated()) {
+                log.error("Invalid username or password!");
+                throw new AuthenticationFailedException("Authentication failed");
+            }
+
+            log.info("Authentication successful!");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(jwtService.generateToken(loginDto.getEmail()));
+
+        } catch (DisabledException ex) {
+            log.error("Account is disabled!");
+            throw new AuthenticationFailedException("Your account is disabled. Please contact support.");
         }
-        log.info("Authentication successful!");
-        return ResponseEntity.status(HttpStatus.OK).body(jwtService.generateToken(loginDto.getEmail()));
     }
+
 
     public ResponseEntity<String> verifyAccount(@RequestParam String token) {
         Student student = studentRepository.findByVerificationToken(token);
@@ -239,5 +237,11 @@ public class AuthServiceImpl implements AuthService {
         emailService.sendEmail(appUser.getEmail(),
                 "Reset Your Password",
                 "Reset Token : " + appUser.getResetPasswordToken());
+    }
+
+    private void verifyAccountTokenMessage(AppUser appUser) {
+        emailService.sendEmail(appUser.getEmail(),
+                "Verify Your Account",
+                "Verify Token: " + appUser.getVerificationToken());
     }
 }

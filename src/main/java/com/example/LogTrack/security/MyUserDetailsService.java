@@ -29,15 +29,15 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Student student = studentRepository.findByEmail(email);
         if(student != null){
-            return new UserPrincipal(student.getEmail(), student.getPassword(),student.getRole());
+            return new UserPrincipal(student.getEmail(), student.getPassword(),student.getRole(), student.isEnabled());
         }
         Supervisor supervisor = supervisorRepository.findByEmail(email);
         if(supervisor != null){
-            return new UserPrincipal(supervisor.getEmail(), supervisor.getPassword(),supervisor.getRole());
+            return new UserPrincipal(supervisor.getEmail(), supervisor.getPassword(),supervisor.getRole(), supervisor.isEnabled());
         }
         Admin admin = adminRepository.findByEmail(email);
         if(admin != null){
-            return new UserPrincipal(admin.getEmail(), admin.getPassword(), admin.getRole());
+            return new UserPrincipal(admin.getEmail(), admin.getPassword(), admin.getRole(), admin.isEnabled());
         }
         throw new RuntimeException("User not found!");
     }

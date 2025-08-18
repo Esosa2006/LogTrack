@@ -19,6 +19,8 @@ public class Admin {
     private String phone_no;
     @Column(name = "password")
     private String password;
+    @Column(name = "enabled")
+    private boolean enabled = true;
     @Column(name = "role")
     private Role role;
 }

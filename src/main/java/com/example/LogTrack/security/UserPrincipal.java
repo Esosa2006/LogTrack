@@ -12,11 +12,13 @@ public class UserPrincipal implements UserDetails {
     private final String email;
     private final String password;
     private final Role role;
+    private final boolean enabled;
 
-    public UserPrincipal(String email, String password, Role role) {
+    public UserPrincipal(String email, String password, Role role, boolean enabled) {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.enabled = enabled;
     }
 
     @Override
@@ -51,6 +53,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 }

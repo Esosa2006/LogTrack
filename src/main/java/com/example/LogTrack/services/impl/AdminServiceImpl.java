@@ -134,7 +134,6 @@ public class AdminServiceImpl implements AdminService {
         return ResponseEntity.status(HttpStatus.OK).body(sentence);
     }
 
-
     private static void emptyListCheck(List<StudentViewDto> list) {
         if (list.isEmpty()){
             throw new EmptyRepoException("No students found!");
