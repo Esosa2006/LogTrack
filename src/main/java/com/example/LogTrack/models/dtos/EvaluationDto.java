@@ -1,9 +1,4 @@
 package com.example.LogTrack.models.dtos;
 
-import lombok.Data;
-
-@Data
-public class EvaluationDto {
-    private String status;
-    private String comment;
+public record EvaluationDto(String status, String comment) {
 }

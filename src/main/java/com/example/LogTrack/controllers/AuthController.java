@@ -48,7 +48,7 @@ public class AuthController {
 
     @PostMapping("/verifyResetPasswordToken")
     public ResponseEntity<String> verifyResetPasswordToken(@RequestParam String token,
-                                                           @RequestBody ResetPasswordDto resetPasswordDto){
+                                                           @Valid @RequestBody ResetPasswordDto resetPasswordDto){
         return authService.verifyResetPasswordToken(token, resetPasswordDto);
     }
 }
