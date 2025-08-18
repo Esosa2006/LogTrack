@@ -1,5 +1,10 @@
 package com.example.LogTrack.models.dtos.adminViews;
 
-public record AssignedStudentOverviewDto(String name, String matricNumber) {
+import lombok.Data;
+
+@Data
+public class AssignedStudentOverviewDto {
+    private String name;
+    private String matricNumber;
 }
 

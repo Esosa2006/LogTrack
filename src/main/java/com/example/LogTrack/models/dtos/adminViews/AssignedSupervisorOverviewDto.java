@@ -1,4 +1,9 @@
 package com.example.LogTrack.models.dtos.adminViews;
 
-public record AssignedSupervisorOverviewDto(String name, String email) {
+import lombok.Data;
+
+@Data
+public class AssignedSupervisorOverviewDto {
+    private String name;
+    private String email;
 }
