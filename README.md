@@ -35,44 +35,31 @@ You’ll probably need to open the main and try running a few things. It support
 
 ## 📁 File Structure
 ```powershell
-src/
- ├── main/
- │   ├── java/
- │   │   └── com/LBS/Library/Management/System/
- │   │       ├── AvailabilityStatus.java
- │   │       ├── LibraryManagementSystemApplication.java
- │   │       ├── controllers/
- │   │       │   ├── LibrarianController.java
- │   │       │   └── UserController.java
- │   │       ├── dtos/
- │   │       │   ├── BookDto.java
- │   │       │   ├── RentalsDto.java
- │   │       │   └── UserRegistrationDto.java
- │   │       ├── entities/
- │   │       │   ├── Admin.java
- │   │       │   ├── Book.java
- │   │       │   ├── Librarian.java
- │   │       │   ├── Rentals.java
- │   │       │   └── User.java
- │   │       ├── exceptions/
- │   │       │   ├── Exception.java
- │   │       │   ├── GlobalExceptionHandler.java
- │   │       │   └── GlobalRuntimeException.java
- │   │       ├── mappers/
- │   │       │   ├── BookMapper.java
- │   │       │   └── RentalsMapper.java
- │   │       ├── repositories/
- │   │       │   ├── BookRepository.java
- │   │       │   ├── RentalRepository.java
- │   │       │   └── UserRepository.java
- │   │       └── services/
- │   │           ├── LibrarianService.java
- │   │           └── UserService.java
- │   └── resources/
- │       └── application.yml
- └── test/
-     └── java/com/LBS/Library/Management/System/
-         └── LibraryManagementSystemApplicationTests.java
+├───src
+│   ├───main
+│   │   ├───java
+│   │   │   └───com
+│   │   │       └───example
+│   │   │           └───LogTrack
+│   │   │               ├───config
+│   │   │               ├───controllers
+│   │   │               ├───enums
+│   │   │               ├───exceptions
+│   │   │               │   └───exceptions
+│   │   │               ├───mapper
+│   │   │               ├───models
+│   │   │               │   ├───dtos
+│   │   │               │   │   ├───adminViews
+│   │   │               │   │   │   └───systemInfo
+│   │   │               │   │   ├───authDtos
+│   │   │               │   │   ├───logEntries
+│   │   │               │   │   └───weeklySummaries
+│   │   │               │   └───entities
+│   │   │               ├───repositories
+│   │   │               ├───security
+│   │   │               ├───services
+│   │   │               │   └───impl
+│   │   │               └───utils
 ```
 
 ## Steps to Contribute
