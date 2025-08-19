@@ -8,5 +8,5 @@ public class LogEntryCreationDto {
     @NotBlank(message = "This field cannot be blank!")
     private String activityDescription;
     private int weekNumber;
-    private int dayNo;
+    private String dayOfTheWeek;
 }

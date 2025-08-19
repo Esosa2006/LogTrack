@@ -1,5 +1,6 @@
 package com.example.LogTrack.services;
 
+import com.example.LogTrack.enums.DayOfTheWeek;
 import com.example.LogTrack.exceptions.exceptions.GlobalException;
 import com.example.LogTrack.exceptions.exceptions.InvalidDayNumberException;
 import com.example.LogTrack.mapper.SummaryDisplayMapper;
@@ -71,6 +72,43 @@ public class WeeklySummaryService {
         return studentRepository.save(student);
     }
 
+    public Student addEntryToWeeklySummaryTest(LogEntry logEntry, int weekNumber, Student student, String dayOfTheWeek) {
+        List<WeeklySummary> summaries = student.getWeeklySummaries();
+
+        WeeklySummary targetSummary = getTargetSummary(summaries, weekNumber);
+
+        if (!isDay(dayOfTheWeek)){
+            throw new GlobalException("Enter a day of the week from Monday to Saturday!");
+        }
+
+        if (targetSummary == null) {
+            targetSummary = new WeeklySummary();
+            targetSummary.setStudent(student);
+            targetSummary.setWeekNumber(weekNumber);
+            targetSummary.setEntries(new ArrayList<>());
+            summaries.add(targetSummary);
+        }
+
+        if (targetSummary.getEntries() == null) {
+            targetSummary.setEntries(new ArrayList<>());
+        }
+
+        if (targetSummary.getEntries().size() >= 6) {
+            throw new GlobalException("This week's summary already has 6 entries.");
+        }
+
+        boolean existsForDay = targetSummary.getEntries().stream()
+                .anyMatch(e -> e != null && Objects.equals(e.getDay(), DayOfTheWeek.valueOf(dayOfTheWeek)));
+        if (existsForDay) {
+            throw new GlobalException("Entry already exists in this field");
+        }
+
+        logEntry.setDay(DayOfTheWeek.valueOf(dayOfTheWeek));
+        targetSummary.getEntries().add(logEntry);
+        logEntry.setWeeklySummary(targetSummary);
+        return studentRepository.save(student);
+    }
+
     private WeeklySummary getTargetSummary(List<WeeklySummary> summaries, int weekNumber) {
         for (WeeklySummary summary : summaries) {
             if (summary.getWeekNumber() == weekNumber) {
@@ -102,5 +140,16 @@ public class WeeklySummaryService {
         }
         weeklySummary.setSummaryText(finalSummary.toString());
         return weeklySummary;
+    }
+
+    private boolean isDay(String day){
+        List<String> daysOfTheWeek  = new ArrayList<>();
+        daysOfTheWeek.add("MONDAY");
+        daysOfTheWeek.add("TUESDAY");
+        daysOfTheWeek.add("WEDNESDAY");
+        daysOfTheWeek.add("THURSDAY");
+        daysOfTheWeek.add("FRIDAY");
+        daysOfTheWeek.add("SATURDAY");
+        return daysOfTheWeek.contains(day.toUpperCase());
     }
 }

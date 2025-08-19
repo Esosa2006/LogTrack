@@ -1,4 +1,9 @@
 package com.example.LogTrack.models.dtos.logEntries;
 
-public record LogEntryQueryDto(int weekNo, int dayNo) {
+import lombok.Data;
+
+@Data
+public class LogEntryQueryDto {
+    private int weekNo;
+    private int dayNo;
 }

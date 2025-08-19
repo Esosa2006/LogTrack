@@ -1,5 +1,6 @@
 package com.example.LogTrack.models.entities;
 
+import com.example.LogTrack.enums.DayOfTheWeek;
 import com.example.LogTrack.enums.EntryStatus;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class LogEntry {
     private EntryStatus status;
     @Column(name = "activityDescrption")
     private String activityDescription;
+    @Column(name = "dayOfTheWeek")
+    private DayOfTheWeek day;
     @Column(name = "comment")
     private String comment;
     @ManyToOne

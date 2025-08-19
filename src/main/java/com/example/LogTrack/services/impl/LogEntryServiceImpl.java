@@ -1,5 +1,6 @@
 package com.example.LogTrack.services.impl;
 
+import com.example.LogTrack.enums.DayOfTheWeek;
 import com.example.LogTrack.enums.EntryStatus;
 import com.example.LogTrack.exceptions.exceptions.*;
 import com.example.LogTrack.models.dtos.logEntries.DailyLogEntryDto;
@@ -45,69 +46,27 @@ public class LogEntryServiceImpl implements LogEntryService {
     }
 
     @Override
-    public ResponseEntity<String> createLogEntry(LogEntryCreationDto logEntryCreationDto, String email) {
+    public ResponseEntity<String> createLogEntryWithDay(LogEntryCreationDto logEntryCreationDto, String email) {
         Student student = studentRepository.findByEmail(email);
         if (student == null) {
             log.error("Student with email {} not found in student Repo", email);
             throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
-        ensureEnabled(student);
         LogEntry logEntry = new LogEntry();
         logEntry.setDate(LocalDate.now());
         logEntry.setStatus(EntryStatus.PENDING);
         logEntry.setActivityDescription(logEntryCreationDto.getActivityDescription());
-        weeklySummaryService.addEntryToWeeklySummary(logEntry, logEntryCreationDto.getWeekNumber(), student, logEntryCreationDto.getDayNo());
+        weeklySummaryService.addEntryToWeeklySummaryTest(logEntry, logEntryCreationDto.getWeekNumber(), student, logEntryCreationDto.getDayOfTheWeek().toUpperCase());
         log.info("Log Entry created successfully");
+        if(student.getSupervisor() == null){
+            throw new GlobalException("You do not have an assigned supervisor yet. Contact support to get assigned!");
+        }
         emailService.sendEmail(student.getSupervisor().getEmail(),
                 "New Long Entry Submission",
                 "Student " + student.getName() + " has submitted new Log Entry"
-                );
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body("Entry successfully created");
     }
-
-    @Override
-    public ResponseEntity<DailyLogEntryDto> viewLogEntry(int weekNumber, int dayNo, String email) {
-        Student student = studentRepository.findByEmail(email);
-        if (student == null){
-            log.error("Student with email {} not found in student repository.", email);
-            throw new StudentNotFoundException("Student with email " + email + " not found!");
-        }
-        ensureEnabled(student);
-        WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNumber, student);
-        if (weeklySummary == null) {
-            log.error("WeeklySummary not found in summary Repo");
-            throw new WeeklySummaryNotFoundException("No week with this week number was found!");
-        }
-
-        if (dayNo < 1 || dayNo > 7) {
-            log.error("Day number out of range");
-            throw new InvalidDayNumberException("Invalid day number! Pick between days 1-6");
-        }
-
-        LogEntry matchingEntry = null;
-        for (LogEntry entry : weeklySummary.getEntries()) {
-            if (entry != null && Objects.equals(entry.getDayNo(), dayNo)) {
-                matchingEntry = entry;
-                break;
-            }
-        }
-
-        if (matchingEntry == null) {
-            log.error("No log entry found for day {}", dayNo);
-            throw new NoLogEntryFoundException("No log entry was found!");
-        }
-
-        DailyLogEntryDto dailyLogEntryDto = new DailyLogEntryDto();
-        dailyLogEntryDto.setDate(matchingEntry.getDate());
-        dailyLogEntryDto.setActivityDescription(matchingEntry.getActivityDescription());
-        dailyLogEntryDto.setComment(matchingEntry.getComment());
-        dailyLogEntryDto.setStatus(matchingEntry.getStatus());
-        dailyLogEntryDto.setId(matchingEntry.getId());
-
-        log.info("Log Entry retrieved successfully");
-        return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDto);
-    }
-
 
     @Override
     public ResponseEntity<String> updateLogEntry(String email, Long id, Map<String, Object> updates) {
@@ -116,7 +75,6 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.error("Student with email {} not found in student repository", email);
             throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
-        ensureEnabled(student);
         LogEntry logEntry = logEntryRepository.findById(id).orElseThrow(() -> new NoLogEntryFoundException("Log entry for " + student.getName() + " with id " + id + " not found!"));
         if (logEntry.getStatus().equals(EntryStatus.PENDING)) {
             if (updates.containsKey("activityDescription")) {
@@ -144,7 +102,6 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.error("Student with email {} not found in student repo", email);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found!");
         }
-        ensureEnabled(student);
 
         WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(logEntryQueryDto.getWeekNo(), student);
         if (weeklySummary == null) {
@@ -185,7 +142,6 @@ public class LogEntryServiceImpl implements LogEntryService {
             log.info("Student with email ({}) not found in student repo", email);
             throw new StudentNotFoundException("Student with email " + email + " not found!");
         }
-        ensureEnabled(student);
         EntryStatus entryStatus = EntryStatus.valueOf(status);
         List<LogEntry> logEntryList = logEntryRepository.findByStatusAndStudentId(entryStatus, student.getId());
         List<DailyLogEntryDto> dailyLogEntryDtoList = new ArrayList<>();
@@ -201,10 +157,41 @@ public class LogEntryServiceImpl implements LogEntryService {
         log.info("Entries retrieved successfully");
         return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDtoList);
     }
-    private void ensureEnabled(Student student) {
-        if (!student.isEnabled()) {
-            throw new GlobalException("Please verify your email before continuing.");
-        }
-    }
 
+    @Override
+    public ResponseEntity<DailyLogEntryDto> viewLogEntry(String email, String dayOfTheWeek, int weekNumber) {
+        Student student = studentRepository.findByEmail(email);
+        if (student == null){
+            log.error("Student with email {} not found in student repository.", email);
+            throw new StudentNotFoundException("Student with email " + email + " not found!");
+        }
+        WeeklySummary weeklySummary = weeklySummaryRepository.findByWeekNumberAndStudent(weekNumber, student);
+        if (weeklySummary == null) {
+            log.error("WeeklySummary not found in summary Repo");
+            throw new WeeklySummaryNotFoundException("No week with this week number was found!");
+        }
+
+        LogEntry matchingEntry = null;
+        for (LogEntry entry : weeklySummary.getEntries()) {
+            if (entry != null && entry.getDay().toString().equalsIgnoreCase(dayOfTheWeek)) {
+                matchingEntry = entry;
+                break;
+            }
+        }
+
+        if (matchingEntry == null) {
+            log.error("No log entry found for {}", dayOfTheWeek);
+            throw new NoLogEntryFoundException("No log entry was found!");
+        }
+
+        DailyLogEntryDto dailyLogEntryDto = new DailyLogEntryDto();
+        dailyLogEntryDto.setDate(matchingEntry.getDate());
+        dailyLogEntryDto.setActivityDescription(matchingEntry.getActivityDescription());
+        dailyLogEntryDto.setComment(matchingEntry.getComment());
+        dailyLogEntryDto.setStatus(matchingEntry.getStatus());
+        dailyLogEntryDto.setId(matchingEntry.getId());
+
+        log.info("Log Entry retrieved successfully");
+        return ResponseEntity.status(HttpStatus.OK).body(dailyLogEntryDto);
+    }
 }

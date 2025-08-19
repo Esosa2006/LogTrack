@@ -27,19 +27,12 @@ public class LogEntryController {
         this.weeklySummaryService = weeklySummaryService;
     }
 
-    @PostMapping("/entry/create")
-    public ResponseEntity<String> createLogEntry(@Valid @RequestBody LogEntryCreationDto logEntryCreationDto,
-                                                 Authentication authentication){
-        String email = authentication.getName();
-        return logEntryService.createLogEntry(logEntryCreationDto, email);
-    }
-
-    @GetMapping("/entry/view")
-    public ResponseEntity<DailyLogEntryDto> viewLogEntry(@Valid @RequestBody LogEntryQueryDto logEntryQueryDto,
-                                                         Authentication authentication){
-        String email = authentication.getName();
-        return logEntryService.viewLogEntry(logEntryQueryDto.getWeekNo(), logEntryQueryDto.getDayNo(), email);
-    }
+//    @PostMapping("/entry/create")
+//    public ResponseEntity<String> createLogEntry(@Valid @RequestBody LogEntryCreationDto logEntryCreationDto,
+//                                                 Authentication authentication){
+//        String email = authentication.getName();
+//        return logEntryService.createLogEntry(logEntryCreationDto, email);
+//    }
 
     @PatchMapping("/entry/update/{id}")
     public ResponseEntity<String> updateLogEntry(@PathVariable Long id,
@@ -69,5 +62,20 @@ public class LogEntryController {
                                                               @RequestParam String status){
         String email = authentication.getName();
         return logEntryService.getByStatus(email, status);
+    }
+
+    @GetMapping("/byDay")
+    public ResponseEntity<DailyLogEntryDto> viewLogEntry(@RequestParam String dayOfTheWeek,
+                                                     @RequestParam int weekNumber,
+                                                     Authentication authentication){
+        String email = authentication.getName();
+        return logEntryService.viewLogEntry(email, dayOfTheWeek, weekNumber);
+    }
+
+    @PostMapping("/entry/createByDay")
+    public ResponseEntity<String> createByDay(@RequestBody LogEntryCreationDto logEntryCreationDto,
+                                              Authentication authentication){
+        String email = authentication.getName();
+        return logEntryService.createLogEntryWithDay(logEntryCreationDto, email);
     }
 }
