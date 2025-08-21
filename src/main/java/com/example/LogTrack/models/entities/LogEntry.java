@@ -19,10 +19,12 @@ public class LogEntry {
     @Column(name = "day")
     private Integer dayNo;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private EntryStatus status;
     @Column(name = "activityDescrption")
     private String activityDescription;
     @Column(name = "dayOfTheWeek")
+    @Enumerated(EnumType.STRING)
     private DayOfTheWeek day;
     @Column(name = "comment")
     private String comment;

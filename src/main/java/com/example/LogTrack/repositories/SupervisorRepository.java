@@ -7,12 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SupervisorRepository extends JpaRepository<Supervisor,Integer> {
+public interface SupervisorRepository extends JpaRepository<Supervisor,Long> {
     Supervisor findByEmail(String email);
     List<Supervisor> findAllByName(String name);
     List<Supervisor> findAllByEmail(String email);
-
-    Supervisor findByVerificationToken(String token);
-
-    Supervisor findByResetPasswordToken(String resetPasswordToken);
 }

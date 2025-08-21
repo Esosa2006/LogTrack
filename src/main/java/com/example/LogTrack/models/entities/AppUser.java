@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -23,14 +25,17 @@ public class AppUser {
     private String email;
     @Column(name = "password")
     private String password;
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
     @Column(name = "createdAt")
     private Date createdAt;
     @Column(name = "enabled")
     private boolean enabled = false;
-    @Column(name = "verificationToken")
-    private String verificationToken;
-    @Column(name = "resetPasswordToken")
-    private String resetPasswordToken;
+//    @Column(name = "verificationToken")
+//    private String verificationToken;
+//    @Column(name = "resetPasswordToken")
+//    private String resetPasswordToken;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Token> tokens = new ArrayList<>();
 }

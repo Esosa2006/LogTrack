@@ -1,6 +1,7 @@
 package com.example.LogTrack.services.impl;
 
 import com.example.LogTrack.enums.Role;
+import com.example.LogTrack.enums.TokenType;
 import com.example.LogTrack.exceptions.exceptions.AuthenticationFailedException;
 import com.example.LogTrack.exceptions.exceptions.EmailAlreadyInUseException;
 import com.example.LogTrack.exceptions.exceptions.GlobalException;
@@ -12,8 +13,10 @@ import com.example.LogTrack.models.dtos.authDtos.SupervisorSignUpRequest;
 import com.example.LogTrack.models.entities.AppUser;
 import com.example.LogTrack.models.entities.Student;
 import com.example.LogTrack.models.entities.Supervisor;
+import com.example.LogTrack.models.entities.Token;
 import com.example.LogTrack.repositories.StudentRepository;
 import com.example.LogTrack.repositories.SupervisorRepository;
+import com.example.LogTrack.repositories.TokenRepository;
 import com.example.LogTrack.security.JWTService;
 import com.example.LogTrack.services.AuthService;
 import com.example.LogTrack.services.EmailService;
@@ -29,8 +32,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -40,14 +43,16 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
     private final EmailService emailService;
+    private final TokenRepository tokenRepository;
 
     @Autowired
-    public AuthServiceImpl(StudentRepository studentRepository, SupervisorRepository supervisorRepository, AuthenticationManager authenticationManager, JWTService jwtService, EmailService emailService) {
+    public AuthServiceImpl(StudentRepository studentRepository, SupervisorRepository supervisorRepository, AuthenticationManager authenticationManager, JWTService jwtService, EmailService emailService, TokenRepository tokenRepository) {
         this.studentRepository = studentRepository;
         this.supervisorRepository = supervisorRepository;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.emailService = emailService;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -105,43 +110,45 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-
     public ResponseEntity<String> verifyAccount(@RequestParam String token) {
-        Student student = studentRepository.findByVerificationToken(token);
-        if (student != null) {
-            student.setEnabled(true);
-            student.setVerificationToken(null);
+        Token userToken = tokenRepository.findTokenByToken(token);
+        tokenChecks(userToken);
+        AppUser appUser = userToken.getUser();
+        if (appUser == null) {
+            throw new GlobalException("No user linked to this token");
+        }
+
+        appUser.setEnabled(true);
+        userToken.setUsed(true);
+
+        if (appUser instanceof Student student) {
             studentRepository.save(student);
             studentWelcomeMessage(student);
-            return ResponseEntity.ok("Account verified! You can now log in.");
         }
-        Supervisor supervisor = supervisorRepository.findByVerificationToken(token);
-        if(supervisor != null){
-            supervisor.setEnabled(true);
-            supervisor.setVerificationToken(null);
+        if (appUser instanceof Supervisor supervisor) {
             supervisorRepository.save(supervisor);
             supervisorWelcomeMessage(supervisor);
-            return ResponseEntity.ok("Account verified! You can now log in.");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid verification link.");
+
+        return ResponseEntity.ok("Account verified! You can now log in.");
     }
+
 
     @Override
     public ResponseEntity<String> resetPassword(String email) {
         if(email == null) {
             throw new GlobalException("No email was entered!");
         }
-        String resetPasswordToken = UUID.randomUUID().toString();
         Student student = studentRepository.findByEmail(email);
         if (student != null) {
-            student.setResetPasswordToken(resetPasswordToken);
+            addPasswordResetToken(student);
             studentRepository.save(student);
             resetPasswordMessage(student);
             return ResponseEntity.status(HttpStatus.OK).body("Reset Password Email Sent!");
         }
         Supervisor supervisor = supervisorRepository.findByEmail(email);
         if (supervisor != null) {
-            supervisor.setResetPasswordToken(resetPasswordToken);
+            addPasswordResetToken(supervisor);
             supervisorRepository.save(supervisor);
             resetPasswordMessage(supervisor);
             return ResponseEntity.status(HttpStatus.OK).body("Reset Password Email Sent!");
@@ -151,21 +158,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<String> verifyResetPasswordToken(String token, ResetPasswordDto resetPasswordDto) {
-        Student student = studentRepository.findByResetPasswordToken(token);
-        if (student != null){
-            if (resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmNewPassword())) {
+        Token userToken =  tokenRepository.findTokenByToken(token);
+        tokenChecks(userToken);
+        AppUser appUser = userToken.getUser();
+        boolean passwordMatch = resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmNewPassword());
+        if (passwordMatch) {
+            if(appUser instanceof Student student) {
+                userToken.setUsed(true);
                 BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
                 student.setPassword(encoder.encode(resetPasswordDto.getNewPassword()));
                 studentRepository.save(student);
                 return ResponseEntity.status(HttpStatus.OK).body("Password Successfully Reset!");
             }
-            else{
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match!");
-            }
-        }
-        Supervisor supervisor = supervisorRepository.findByResetPasswordToken(token);
-        if (supervisor != null){
-            if (resetPasswordDto.getNewPassword().equals(resetPasswordDto.getConfirmNewPassword())) {
+            else if (appUser instanceof Supervisor supervisor) {
+                userToken.setUsed(true);
                 BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
                 supervisor.setPassword(encoder.encode(resetPasswordDto.getNewPassword()));
                 supervisorRepository.save(supervisor);
@@ -175,7 +181,9 @@ public class AuthServiceImpl implements AuthService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match!");
             }
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token!");
+        else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token!");
+        }
     }
 
 
@@ -189,8 +197,11 @@ public class AuthServiceImpl implements AuthService {
         newStudent.setRole(Role.STUDENT);
         newStudent.setCreatedAt(new Date());
         newStudent.setEnabled(false);
-        String token = UUID.randomUUID().toString();
-        newStudent.setVerificationToken(token);
+        Token token = new Token();
+        token.setTokenType(TokenType.ACCOUNT_ACTIVATION);
+        token.setExpiry(LocalDateTime.now().plusHours(24));
+        token.setUser(newStudent);
+        newStudent.getTokens().add(token);
         return newStudent;
     }
 
@@ -203,8 +214,11 @@ public class AuthServiceImpl implements AuthService {
         newSupervisor.setRole(Role.SUPERVISOR);
         newSupervisor.setCreatedAt(new Date());
         newSupervisor.setEnabled(false);
-        String token = UUID.randomUUID().toString();
-        newSupervisor.setVerificationToken(token);
+        Token token = new Token();
+        token.setTokenType(TokenType.ACCOUNT_ACTIVATION);
+        token.setExpiry(LocalDateTime.now().plusHours(24));
+        token.setUser(newSupervisor);
+        newSupervisor.getTokens().add(token);
         return newSupervisor;
     }
 
@@ -234,14 +248,50 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void resetPasswordMessage(AppUser appUser) {
-        emailService.sendEmail(appUser.getEmail(),
+        Token resetToken = appUser.getTokens().stream()
+                .filter(token -> token.getTokenType() == TokenType.PASSWORD_RESET && !token.isUsed())
+                .findFirst()
+                .orElseThrow(() -> new GlobalException("No active reset token found"));
+
+        emailService.sendEmail(
+                appUser.getEmail(),
                 "Reset Your Password",
-                "Reset Token : " + appUser.getResetPasswordToken());
+                "Reset Token : " + resetToken.getToken()
+        );
     }
 
     private void verifyAccountTokenMessage(AppUser appUser) {
-        emailService.sendEmail(appUser.getEmail(),
-                "Verify Your Account",
-                "Verify Token: " + appUser.getVerificationToken());
+        Token resetToken = appUser.getTokens().stream()
+                .filter(token -> token.getTokenType() == TokenType.ACCOUNT_ACTIVATION && !token.isUsed())
+                .findFirst()
+                .orElseThrow(() -> new GlobalException("No active account activation token found"));
+
+        emailService.sendEmail(
+                appUser.getEmail(),
+                "Activate your LogTrack account",
+                "Activation Token : " + resetToken.getToken()
+        );
+    }
+
+    private void addPasswordResetToken(AppUser appUser) {
+        Token token = new Token();
+        token.setTokenType(TokenType.PASSWORD_RESET);
+        token.setExpiry(LocalDateTime.now().plusMinutes(10));
+        token.setUser(appUser);
+        appUser.getTokens().add(token);
+    }
+
+    private void tokenChecks(Token userToken){
+        if (userToken == null) {
+            throw new GlobalException("Invalid token");
+        }
+
+        if (userToken.getExpiry().isBefore(LocalDateTime.now())) {
+            throw new GlobalException("Token has expired");
+        }
+
+        if (userToken.isUsed()) {
+            throw new GlobalException("Token has already been used");
+        }
     }
 }
