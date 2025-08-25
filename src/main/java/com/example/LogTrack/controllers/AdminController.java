@@ -3,6 +3,7 @@ package com.example.LogTrack.controllers;
 import com.example.LogTrack.models.dtos.AssignmentDto;
 import com.example.LogTrack.models.dtos.adminViews.StudentViewDto;
 import com.example.LogTrack.models.dtos.adminViews.SupervisorDto;
+import com.example.LogTrack.models.entities.Token;
 import com.example.LogTrack.services.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,14 @@ public class AdminController {
         return adminService.getActiveUserCount();
     }
 
+    @PostMapping("/revokeToken/{id}")
+    public ResponseEntity<String> revokeToken(@PathVariable Long id){
+        return adminService.revokeToken(id);
+    }
 
+    @GetMapping("/tokens")
+    public ResponseEntity<List<Token>> getTokens(@RequestParam String state){
+        return adminService.getTokens(state);
+    }
 
 }

@@ -34,4 +34,6 @@ public class Token {
     private boolean used;
     @Column(name = "expiry")
     private LocalDateTime expiry;
+    @Column(name = "revoked")
+    private boolean revoked;
 }
