@@ -40,7 +40,7 @@ You’ll probably need to open the main and try running a few things. It support
 │   │   ├───java
 │   │   │   └───com
 │   │   │       └───example
-│   │   │           └───LogTrack
+│   │   │           └───LogTrack 
 │   │   │               ├───config
 │   │   │               ├───controllers
 │   │   │               ├───enums
